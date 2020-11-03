@@ -1,0 +1,2 @@
+include ':approovsdk'
+rootProject.name = 'approovsdkflutter'
