@@ -124,10 +124,11 @@ For Android: if the Android build fails with `Manifest merger failed : Attribute
         xmlns:tools="http://schemas.android.com/tools"
         ... >
 ```
-- Add the `tools` attribute to the `application` tag:
+- Add the `android:label` and `tools` attributes to the `application` tag:
 ```
     <application ...
-        tools:replace="android:label"
+        android:label="@string/app_name"
+        tools:replace="label"
         ... >
 ```
 
