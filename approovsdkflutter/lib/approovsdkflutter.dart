@@ -313,6 +313,7 @@ class Approovsdkflutter {
 
   // header that will be added to Approov enabled requests
   static const String APPROOV_HEADER = "Approov-Token";
+  static const String X_APPROOV_HEADER = "X-Approov-Token";
 
   // any prefix to be added before the Approov token, such as "Bearer "
   static const String APPROOV_TOKEN_PREFIX = "";
@@ -322,7 +323,7 @@ class Approovsdkflutter {
 
   // any header to be used for binding in Approov tokens or null if not set
   // TODO why is this not static in other integrations?
-  static String bindingHeader;
+  static String bindingHeader; // TODO? Make this client-specific
 
   /// Initializes Approov-Flutter.
   ///
@@ -336,7 +337,7 @@ class Approovsdkflutter {
     String initialConfig;
     try {
       initialConfig = await rootBundle.loadString('approov-initial.config');
-    } catch(e) {
+    } catch (e) {
       // It is fatal if the SDK cannot read an initial configuration
       Log.e(TAG, "Approov initial configuration read failed: ${e.toString()}");
       return;
@@ -416,7 +417,7 @@ class Approovsdkflutter {
   ///
   /// @param request is the HttpClientRequest to which Approov is being added
   /// @throws Exception if it is not possible to obtain an Approov token
-  static Future<void> addApproovToHttpClientRequest(HttpClientRequest request) async {
+  static Future<void> addApproovToHttpClientRequest(HttpClientRequest request, {String approovHeader = APPROOV_HEADER}) async {
     // just return if we couldn't initialize the SDK
     if (!isInitialized) {
       Log.e(TAG, "Cannot add Approov due to initialization failure");
@@ -448,7 +449,7 @@ class Approovsdkflutter {
     // check the status of Approov token fetch
     if (approovResults.tokenFetchStatus == TokenFetchStatus.SUCCESS) {
       // we successfully obtained a token so add it to the header for the request
-      request.headers.set(APPROOV_HEADER, APPROOV_TOKEN_PREFIX + approovResults.token);
+      request.headers.set(approovHeader, APPROOV_TOKEN_PREFIX + approovResults.token, preserveHeaderCase: true);
     } else if ((approovResults.tokenFetchStatus != TokenFetchStatus.NO_APPROOV_SERVICE) &&
         (approovResults.tokenFetchStatus != TokenFetchStatus.UNKNOWN_URL) &&
         (approovResults.tokenFetchStatus != TokenFetchStatus.UNPROTECTED_URL)) {
@@ -585,12 +586,25 @@ class ApproovHttpClient implements HttpClient {
   // logging tag
   static const String TAG = "ApproovHttpClient";
 
+  // The name of the header used for transmitting the Approov token
+  String _approovHeader = Approovsdkflutter.APPROOV_HEADER;
+
+  // Set the name of the header used for transmitting the Approov token
+  // @param header the name of the header. Only Approov-Token or X-Approov-Token are allowed.
+  void set approovHeader(String header) {
+    if (header != Approovsdkflutter.APPROOV_HEADER && header != Approovsdkflutter.X_APPROOV_HEADER) {
+      throw "ApproovHttpClient: Approov header must be ${Approovsdkflutter.APPROOV_HEADER} or"
+          " ${Approovsdkflutter.X_APPROOV_HEADER}";
+    }
+    _approovHeader = header;
+  }
+
   // Internal HttpClient delegate, will be rebuilt if pinning fails (or pins change)
   HttpClient _inner = HttpClient();
 
   // The host to which the inner HttpClient delegate is connected and, optionally, pinning. Used to detect when to
   // re-create the inner HttpClient.
-  String connectedHost;
+  String _connectedHost;
 
   // State required to implement getters and setters required by the HttpClient interface
   Future<bool> Function(Uri url, String scheme, String realm) _authenticate;
@@ -618,7 +632,7 @@ class ApproovHttpClient implements HttpClient {
 
     // Reset host certificates and inner HttpClient to force them to be recreated
     Approovsdkflutter.removeCertificates(host);
-    connectedHost = null;
+    _connectedHost = null;
     return false;
   }
 
@@ -647,7 +661,7 @@ class ApproovHttpClient implements HttpClient {
       httpClient = HttpClient(context: securityContext);
     }
 
-    connectedHost = url.host;
+    _connectedHost = url.host;
 
     // Copy state from previous inner HttpClient to the new one
     httpClient.idleTimeout = _inner.idleTimeout;
@@ -671,26 +685,26 @@ class ApproovHttpClient implements HttpClient {
 
   @override
   Future<HttpClientRequest> open(String method, String host, int port, String path) async {
-    if (connectedHost != host) {
+    if (_connectedHost != host) {
       Uri url = Uri(scheme: "https", host: host, port: port, path: path);
       HttpClient httpClient = await _createApproovHttpClient(url);
       _inner.close();
       _inner = httpClient;
     }
     HttpClientRequest httpClientRequest = await _inner.open(method, host, port, path);
-    await Approovsdkflutter.addApproovToHttpClientRequest(httpClientRequest);
+    await Approovsdkflutter.addApproovToHttpClientRequest(httpClientRequest, approovHeader: _approovHeader);
     return httpClientRequest;
   }
 
   @override
   Future<HttpClientRequest> openUrl(String method, Uri url) async {
-    if (connectedHost != url.host) {
+    if (_connectedHost != url.host) {
       HttpClient httpClient = await _createApproovHttpClient(url);
       _inner.close();
       _inner = httpClient;
     }
     HttpClientRequest httpClientRequest = await _inner.openUrl(method, url);
-    await Approovsdkflutter.addApproovToHttpClientRequest(httpClientRequest);
+    await Approovsdkflutter.addApproovToHttpClientRequest(httpClientRequest, approovHeader: _approovHeader);
     return httpClientRequest;
   }
 
@@ -808,10 +822,27 @@ class ApproovClient extends http.BaseClient {
   // Internal client delegate
   http.Client _inner;
 
+  // The name of the header used for transmitting the Approov token
+  String _approovHeader = Approovsdkflutter.APPROOV_HEADER;
+
+  // Set the name of the header used for transmitting the Approov token
+  // @param header the name of the header. Only Approov-Token or X-Approov-Token are allowed.
+  void set approovHeader(String header) {
+    if (header != Approovsdkflutter.APPROOV_HEADER && header != Approovsdkflutter.X_APPROOV_HEADER) {
+      throw "ApproovClient: Approov header must be ${Approovsdkflutter.APPROOV_HEADER} or"
+          " ${Approovsdkflutter.X_APPROOV_HEADER}";
+    }
+    if (_inner != null) {
+      throw "ApproovClient: Must not change Approov header after sending message";
+    }
+    _approovHeader = header;
+  }
+
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) {
     if (_inner == null) {
-      HttpClient httpClient = ApproovHttpClient();
+      ApproovHttpClient httpClient = ApproovHttpClient();
+      httpClient.approovHeader = _approovHeader;
       _inner = httpio.IOClient(httpClient);
     }
     return _inner.send(request);
