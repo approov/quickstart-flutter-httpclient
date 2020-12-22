@@ -587,7 +587,7 @@ class ApproovHttpClient implements HttpClient {
   static const String TAG = "ApproovHttpClient";
 
   // The name of the header used for transmitting the Approov token
-  String _approovHeader = Approovsdkflutter.APPROOV_HEADER;
+  String _approovHeader = null;
 
   // Set the name of the header used for transmitting the Approov token
   // @param header the name of the header. Only Approov-Token or X-Approov-Token are allowed.
@@ -595,6 +595,9 @@ class ApproovHttpClient implements HttpClient {
     if (header != Approovsdkflutter.APPROOV_HEADER && header != Approovsdkflutter.X_APPROOV_HEADER) {
       throw "ApproovHttpClient: Approov header must be ${Approovsdkflutter.APPROOV_HEADER} or"
           " ${Approovsdkflutter.X_APPROOV_HEADER}";
+    }
+    if (_approovHeader != null) {
+      throw "ApproovClient: Must not change Approov header after sending request";
     }
     _approovHeader = header;
   }
@@ -692,6 +695,8 @@ class ApproovHttpClient implements HttpClient {
       _inner = httpClient;
     }
     HttpClientRequest httpClientRequest = await _inner.open(method, host, port, path);
+    if (_approovHeader == null)
+      _approovHeader = Approovsdkflutter.APPROOV_HEADER;
     await Approovsdkflutter.addApproovToHttpClientRequest(httpClientRequest, approovHeader: _approovHeader);
     return httpClientRequest;
   }
@@ -704,6 +709,8 @@ class ApproovHttpClient implements HttpClient {
       _inner = httpClient;
     }
     HttpClientRequest httpClientRequest = await _inner.openUrl(method, url);
+    if (_approovHeader == null)
+      _approovHeader = Approovsdkflutter.APPROOV_HEADER;
     await Approovsdkflutter.addApproovToHttpClientRequest(httpClientRequest, approovHeader: _approovHeader);
     return httpClientRequest;
   }
@@ -833,7 +840,7 @@ class ApproovClient extends http.BaseClient {
           " ${Approovsdkflutter.X_APPROOV_HEADER}";
     }
     if (_inner != null) {
-      throw "ApproovClient: Must not change Approov header after sending message";
+      throw "ApproovClient: Must not change Approov header after sending request";
     }
     _approovHeader = header;
   }
