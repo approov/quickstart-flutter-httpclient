@@ -2,9 +2,6 @@
 
 This quickstart is written specifically for Android and iOS apps that are implemented using [`Flutter`](https://flutter.dev/) and the [`Dart HTTPClient class from the dart:io library`](https://api.dart.dev/stable/2.9.3/dart-io/HttpClient-class.html) or the [`Flutter HTTP package`](https://pub.dev/packages/http). If this is not your situation then please check if there is a more relevant Quickstart guide available.
 
-## PLEASE NOTE
-This software is in active development and as such is partially incomplete and will likely contain bugs. It is released as an early preview in the hope that it is useful to get you started with Flutter and Approov.
-
 ## WHAT YOU WILL NEED
 * Access to either the demo account ([request access here](https://info.approov.io/demo-token)) or a trial/paid Approov account
 * The `approov` command line tool [installed](https://approov.io/docs/latest/approov-installation/) with `APPROOV_MANAGEMENT_TOKEN` set with your account access token
@@ -58,64 +55,14 @@ A successful _shapes_ request to `/v1/shapes` returns one of four possible shape
 
 Before building the Flutter Shapes app, make sure that your system is set up for Flutter development by following the instructions at [Flutter Get Started](https://flutter.dev/docs/get-started/install).
 
-### Setting up the Initial Build
-
-Although initially Approov is not used, some Approov related files need to be present for the build to succeed.
-
-#### Add the Latest Approov SDK
-
-The underlying Approov SDK itself is not shipped as part of the `approovsdkflutter` module. To get the latest version of the SDK, use the [`approov` command line tool](https://approov.io/docs/latest/approov-installation/). In a terminal shell in your `quickstart-flutter-httpclient/approovsdkflutter` directory, type:
-
-For Android (if you are using Windows then substitute `approov` with `approov.exe` in all cases in this quickstart):
-
-```
-$ approov sdk -getLibrary android/approovsdk/approovsdk.aar
-```
-This directly gets the SDK into the correct location in the plugin. On success, the tool outputs a message similar to this:
-
-```
-Android SDK library 2.3.0(2726) written to android/approovsdk/approovsdk.aar
-```
-
-For iOS:
-```
-$ cd ios
-$ approov sdk -getLibrary approov.zip
-```
-On success, the tool outputs a message similar to this:
-
-```
-$ iOS SDK library 2.3.0(4359) written to approov.zip
-```
-Unzip the downloaded archive:
-```
-$ unzip approov.zip
-$ cd -
-```
-This will write the Approov SDK framework into `Approov.framework` in the correct location in the plugin.
-
-#### Set up an Initial Approov Configuration
-
-An Approov-enabled app requires a [configuration file](https://approov.io/docs/latest/approov-usage-documentation/#sdk-configuration) to initialize it. The Approov configuration is updated dynamically after subsequent launches of the app. In a shell in the `quickstart-flutter-httpclient/approovsdkflutter/example` directory, use the approov command-line tool to fetch a configuration file:
-
-```
-$ approov sdk -getConfig approov-initial.config
-```
-
-On success, the tool reports:
-
-```
-initial SDK configuration written to approov-initial.config
-```
-
 ### Running the App
 
-To run the app on an attached device, open a shell terminal at the `quickstart-flutter-httpclient/approovsdkflutter/example` directory and type:
+To run the app on an attached device, open a shell terminal at the `quickstart-flutter-httpclient/approov_http_client/example` directory and type:
 
 ```
 $ flutter run
 ```
-For Android: if the Android build fails with `Manifest merger failed : Attribute application@label value=([...]) from AndroidManifest.xml:11:9-46 is also present at [approovsdk.aar] AndroidManifest.xml:12:9-41 value=(@string/app_name)`, then open `quickstart-flutter-httpclient/approovsdkflutter/example/android/app/src/main/AndroidManifest.xml` in an editor and make the following changes.
+For Android: if the Android build fails with `Manifest merger failed : Attribute application@label value=([...]) from AndroidManifest.xml:11:9-46 is also present at [approov-sdk.aar] AndroidManifest.xml:12:9-41 value=(@string/app_name)`, then open `quickstart-flutter-httpclient/approov_http_client/example/android/app/src/main/AndroidManifest.xml` in an editor and make the following changes.
 
 - Add the schema as an attribute in the `manifest` tag:
 
@@ -133,7 +80,7 @@ For Android: if the Android build fails with `Manifest merger failed : Attribute
 ```
 
 For iOS: if the iOS build or run step fail with a signing error, open the Xcode project located in `
-quickstart-flutter-httpclient/approovsdkflutter/example/ios/Runner.xcworkspace`:
+quickstart-flutter-httpclient/approov_http_client/example/ios/Runner.xcworkspace`:
 ```
 $ open ios/Runner.xcworkspace
 ```
@@ -147,26 +94,92 @@ You should now be able to use the app to say hello and get shapes.
 
 ## ADDING APPROOV SUPPORT
 
-### Add the Approov Flutter Plugin
+### Add the Latest Approov SDK
 
-Approov protection is provided through the approovsdkflutter plugin for both, Android and iOS mobile platforms. This plugin handles all Approov related functionality, such as initialization, managing of initial and update configurations, fetching of Approov tokens, adding these to API requests as necessary, and manages certificate public key pinning. The plugin also requests all necessary network permissions.
+The underlying Approov SDK itself is not shipped as part of the `approov_http_client` module. To get the latest version of the SDK, use the [`approov` command line tool](https://approov.io/docs/latest/approov-installation/). In a terminal shell in your `quickstart-flutter-httpclient/approov_http_client` directory, type:
 
-In the source file `quickstart-flutter-httpclient/approovsdkflutter/example/lib/main.dart` find the three locations marked with a comment
+For Android (if you are using Windows then substitute `approov` with `approov.exe` in all cases in this quickstart):
+
+```
+$ approov sdk -getLibrary android/approov-sdk.aar
+```
+This directly gets the SDK into the correct location in the plugin. On success, the tool outputs a message similar to this:
+
+```
+Android SDK library 2.3.0(2726) written to android/approov-sdk.aar
+```
+
+For iOS:
+```
+$ cd ios
+$ approov sdk -getLibrary approov.zip
+```
+On success, the tool outputs a message similar to this:
+
+```
+$ iOS SDK library 2.3.0(4359) written to approov.zip
+```
+Unzip the downloaded archive:
+```
+$ unzip approov.zip
+$ rm approov.zip
+$ cd -
+```
+This will write the Approov SDK framework into `Approov.framework` in the correct location in the plugin.
+
+### Set up an Initial Approov Configuration
+
+An Approov-enabled app requires a [configuration file](https://approov.io/docs/latest/approov-usage-documentation/#sdk-configuration) to initialize it. The Approov configuration is updated dynamically after subsequent launches of the app. In a shell in the `quickstart-flutter-httpclient/approov_http_client/example` directory, use the approov command-line tool to fetch a configuration file:
+
+```
+$ approov sdk -getConfig approov-initial.config
+```
+
+On success, the tool reports:
+
+```
+initial SDK configuration written to approov-initial.config
+```
+
+### Add the Approov HTTP Client Flutter Plugin
+
+Approov protection is provided through the approov_http_client plugin for both, Android and iOS mobile platforms. This plugin handles all Approov related functionality, such as initialization, managing of initial and update configurations, fetching of Approov tokens, adding these to API requests as necessary, and manages certificate public key pinning. The plugin also requests all necessary network permissions.
+
+In the configuration file `quickstart-flutter-httpclient/approov_http_client/example/pubspec.yaml` find the two locations marked with
+```
+# *** UNCOMMENT THE SECTION BELOW FOR APPROOV ***
+```
+and change them as shown
+
+1. Add the dependency for the approov_http_client package
+```
+  # *** UNCOMMENT THE SECTION BELOW FOR APPROOV ***
+  approov_http_client:
+    path: ../
+```
+
+2. Add the initial approov configuration to the app's assets
+```
+    # *** UNCOMMENT THE LINE BELOW FOR APPROOV ***
+    - approov-initial.config
+```
+
+In the source file `quickstart-flutter-httpclient/approov_http_client/example/lib/main.dart` find the two locations marked with a comment
 ```
 // *** UNCOMMENT THE SECTION BELOW FOR APPROOV ***
 ```
 and change them to read
 
-1. Import the approovsdkflutter package
+1. Import the approov_http_client package
 ```
-// *** UNCOMMENT THE SECTION BELOW FOR APPROOV ***
-import 'package:approovsdkflutter/approovsdkflutter.dart';
+// *** UNCOMMENT THE LINE BELOW FOR APPROOV ***
+import 'package:approov_http_client/approov_http_client.dart';
 ```
 
 2. Create a Client.
 ```
 // http.Client client = http.Client();
-// *** UNCOMMENT THE SECTION BELOW FOR APPROOV ***
+// *** UNCOMMENT THE LINE BELOW FOR APPROOV (and comment out the line above) ***
 client = ApproovClient();
 ```
 
@@ -174,7 +187,7 @@ client = ApproovClient();
 
 The Shapes server provides the app with shapes using multiple versions of an API: version 1 (https://shapes.approov.io/v1/shapes) which is _not_ protected by Approov, and version 2 (https://shapes.approov.io/v2/shapes) which _is_ protected by Approov.
 
-Now that we’re using Approov, let’s switch to use version 2 of the Shapes API. Edit the Dart source in `quickstart-flutter-httpclient/approovsdkflutter/example/lib/main.dart` find the line of code:
+Now that we’re using Approov, let’s switch to use version 2 of the Shapes API. Edit the Dart source in `quickstart-flutter-httpclient/approov_http_client/example/lib/main.dart` find the line of code:
 
 ```
 const String API_VERSION = 'v1'; // API v1 is unprotected; API v2 is protected by Approov
@@ -198,7 +211,7 @@ Tokens for this domain will be automatically signed with the specific secret for
 
 Build the app on your preferred platform (Approov requires building for a device on iOS).
 
-For iOS: Note that it may be necessary to run the command `pod update` in the `quickstart-flutter-httpclient/approovsdkflutter/ios` directory first as the Flutter Shapes app is built using the CocoaPods dependency framework.
+For iOS: Note that it may be necessary to run the command `pod update` in the `quickstart-flutter-httpclient/approov_http_client/ios` directory first as the Flutter Shapes app is built using the CocoaPods dependency framework.
 
 Run the app on a device or an emulator and examine the logging. You should see in the logs that Approov is successfully fetching tokens, but the Shapes API is not returning valid shapes:
 
@@ -213,7 +226,7 @@ Run the app on a device or an emulator and examine the logging. You should see i
 
 Although the application is now receiving and forwarding tokens with your API calls, the tokens are not yet properly signed, because the attestation service does not recognize your application. Once you register the app with the Approov service, untampered apps will attest successfully and begin to fetch and transmit valid tokens.
 
-Approov command line tools are provided for Windows, MacOS, and Linux platforms. Select the proper operating system executable. In a shell in your `quickstart-flutter-httpclient/approovsdkflutter/example` directory:
+Approov command line tools are provided for Windows, MacOS, and Linux platforms. Select the proper operating system executable. In a shell in your `quickstart-flutter-httpclient/approov_http_client/example` directory:
 
 For Android:
 
@@ -229,7 +242,7 @@ For iOS:
 $ approov registration -add ../../Runner\ 2020-10-12\ 09-24-57/Runner.ipa`
 ```
 
-If you plan to submit your application to the app store, you must remove the Intel CPU simulator support architectures from the Approov SDK binary before submitting your app. To do so, before building the app, execute the following commands at the directory `quickstart-flutter-httpclient/approovsdkflutter/ios/Approov.framework` using the command line:
+If you plan to submit your application to the app store, you must remove the Intel CPU simulator support architectures from the Approov SDK binary before submitting your app. To do so, before building the app, execute the following commands at the directory `quickstart-flutter-httpclient/approov_http_client/ios/Approov.framework` using the command line:
 
 ```
 lipo Approov -remove i386 -output Approov
@@ -279,12 +292,12 @@ If you have a trial (as opposed to demo) account you have some additional option
 
 It is possible to bind a string of arbitrary data to an Approov token (since Approov tokens can include the hash of an arbitrary data string) which can then be validated by your API.
 
-To bind a data string, call the approovsdkflutter plugin’s `setDataHashInToken(data)` method.
+To bind a data string, call the approov_http_client plugin’s `setDataHashInToken(data)` method.
 
 A common usage for this ‘token binding’ feature is to bind a user’s login token (often an [OAuth2](https://oauth.net/2/) access token), typically specified in the `Authorization` header, to an Approov token thus combining both _user_ authentication and _app_ authentication for an optimal API protection solution. This way only the current authorized user can make API calls from this authenticated app. Example:
 
 ```
-Approovsdkflutter.setBindingHeader('Authorization');
+ApproovService.setBindingHeader('Authorization');
 ```
 
 In the Shapes v2 API, if the backend service finds a `pay` claim in the Approov token, it looks for an authorization bearer token in the request’s `Authorization` header. If one is found, the backend service will verify that the bearer token’s hash matches the Approov token’s `pay` claim. If the bearer token is not found, the backend service rejects the request.
