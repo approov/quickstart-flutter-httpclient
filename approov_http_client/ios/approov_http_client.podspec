@@ -23,5 +23,5 @@ A new flutter plugin project.
   # TODO? s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'VALID_ARCHS[sdk=iphonesimulator*]' => 'x86_64' }
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
 
-  s.vendored_frameworks = 'Approov.framework'
+  s.vendored_frameworks = 'approov.xcframework'
 end
