@@ -229,7 +229,7 @@ $ approov registration -add build/app/outputs/flutter-apk/app-debug.apk
 For iOS: It is necessary to build an app archive (.ipa extension) and export it to a convenient location, for example the `quickstart-flutter-httpclient` directory. Install the app's .ipa on the device in order to ensure that the installed version and the registered version are the same. Assuming you have built an app archive, signed it and exported it to `quickstart-flutter-httpclient/Runner\ 2021-02-04\ 14-27-30/ApproovHttpClient_example.ipa`, the registration command is:
 
 ```
-$ approov registration -add ../../Runner\ 2021-02-04\ 14-27-30/ApproovHttpClient_example.ipa`
+$ approov registration -add ../../Runner\ 2021-02-04\ 14-27-30/ApproovHttpClient_example.ipa
 ```
 
 
