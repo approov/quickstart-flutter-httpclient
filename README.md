@@ -111,21 +111,13 @@ Android SDK library 2.3.0(2726) written to android/approov-sdk.aar
 
 For iOS:
 ```
-$ cd ios
-$ approov sdk -getLibrary approov.zip
+$ approov sdk -getLibrary ios/approov.xcframework
 ```
-On success, the tool outputs a message similar to this:
+This will write the Approov SDK into `approov.xcframework` in the correct location in the plugin. On success, the tool outputs a message similar to this:
 
 ```
-$ iOS SDK library 2.3.0(4359) written to approov.zip
+$ iOS SDK library 2.6.0(5851) written to ios/approov.xcframework
 ```
-Unzip the downloaded archive:
-```
-$ unzip approov.zip
-$ rm approov.zip
-$ cd -
-```
-This will write the Approov SDK framework into `Approov.framework` in the correct location in the plugin.
 
 ### Set up an Initial Approov Configuration
 
@@ -211,9 +203,9 @@ Tokens for this domain will be automatically signed with the specific secret for
 
 Build the app on your preferred platform (Approov requires building for a device on iOS).
 
-For iOS: Note that it may be necessary to run the command `pod update` in the `quickstart-flutter-httpclient/approov_http_client/ios` directory first as the Flutter Shapes app is built using the CocoaPods dependency framework.
+For iOS: Note that it may be necessary to run the command `pod update` in the `quickstart-flutter-httpclient/approov_http_client/example/ios` directory first as the Flutter Shapes app is built using the CocoaPods dependency framework.
 
-Run the app on a device or an emulator and examine the logging. You should see in the logs that Approov is successfully fetching tokens, but the Shapes API is not returning valid shapes:
+Install and run the app on a device or an emulator and examine the logging. You should see in the logs that Approov is successfully fetching tokens, but the Shapes API is not returning valid shapes:
 
 <p>
     <img src="readme-images/flutter-shape-invalid.jpg" width="256" title="Invalid">
@@ -234,22 +226,11 @@ For Android:
 $ approov registration -add build/app/outputs/flutter-apk/app-debug.apk
 ```
 
-For iOS:
-
-(Assuming you have built an app archive, signed it and exported it to `quickstart-flutter-httpclient/Runner 2020-10-12 09-24-57/Runner.ipa`.)
+For iOS: It is necessary to build an app archive (.ipa extension) and export it to a convenient location, for example the `quickstart-flutter-httpclient` directory. Install the app's .ipa on the device in order to ensure that the installed version and the registered version are the same. Assuming you have built an app archive, signed it and exported it to `quickstart-flutter-httpclient/Runner\ 2021-02-04\ 14-27-30/ApproovHttpClient_example.ipa`, the registration command is:
 
 ```
-$ approov registration -add ../../Runner\ 2020-10-12\ 09-24-57/Runner.ipa`
+$ approov registration -add ../../Runner\ 2021-02-04\ 14-27-30/ApproovHttpClient_example.ipa
 ```
-
-If you plan to submit your application to the app store, you must remove the Intel CPU simulator support architectures from the Approov SDK binary before submitting your app. To do so, before building the app, execute the following commands at the directory `quickstart-flutter-httpclient/approov_http_client/ios/Approov.framework` using the command line:
-
-```
-lipo Approov -remove i386 -output Approov
-lipo Approov -remove x86_64 -output Approov
-```
-
-Since executing the above commands will disable support for the iOS Simulator, you may wish to keep a copy of the Approov framework or download another copy if a Simulator run is required.
 
 
 ## RUN THE SHAPES APP WITH APPROOV
@@ -287,6 +268,7 @@ If you have a trial (as opposed to demo) account you have some additional option
 * Consider using an [Annotation Policy](https://approov.io/docs/latest/approov-usage-documentation/#annotation-policies) during development to directly see why the device is not being issued with a valid token.
 * Use `approov metrics` to see [Live Metrics](https://approov.io/docs/latest/approov-usage-documentation/#live-metrics) of the cause of failure.
 * You can use a debugger and get valid Approov tokens on a specific device by [whitelisting](https://approov.io/docs/latest/approov-usage-documentation/#adding-a-device-security-policy).
+
 
 ## USING TOKEN BINDING
 
