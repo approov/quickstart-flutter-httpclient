@@ -60,30 +60,35 @@ enum TokenFetchStatus {
 /// Results from an Approov token fetch
 class TokenFetchResult {
   // Status of the last Approov token fetch
-  TokenFetchStatus tokenFetchStatus;
+  TokenFetchStatus tokenFetchStatus = TokenFetchStatus.INTERNAL_ERROR;
   // Token string of the last Approov token fetch. This may be an empty string if the fetch did not succeed
-  String token;
+  String token = "";
   // An Attestation Response Code (ARC) providing details of the device properties. This is the empty string if no ARC
   // was obtained.
-  String ARC;
+  String ARC = "";
   // Indicates whether a new configuration is available from fetchConfig()
-  bool isConfigChanged;
+  bool isConfigChanged = false;
   // Indicates whether current user APIs must be updated to reflect a new version available from getPins(). Calling
   // getPins() will clear this flag for the next Approov token fetch.
-  bool isForceApplyPins;
+  bool isForceApplyPins = false;
   // Measurement configuration if the last token fetch was to perform an integrity measurement and was successful.
-  Uint8List measurementConfig;
+  Uint8List measurementConfig = Uint8List(0);
   // Loggable Approov token string.
-  String loggableToken;
+  String loggableToken = "";
 
   // Convenience constructor
   TokenFetchResult.fromTokenFetchResultMap(Map aTokenFetchResultMap) {
-    tokenFetchStatus = EnumToString.fromString(TokenFetchStatus.values, aTokenFetchResultMap["TokenFetchStatus"]);
+    TokenFetchStatus? newTokenFetchStatus =
+      EnumToString.fromString(TokenFetchStatus.values, aTokenFetchResultMap["TokenFetchStatus"]);
+    if (newTokenFetchStatus != null)
+      tokenFetchStatus = newTokenFetchStatus;
     token = aTokenFetchResultMap["Token"];
     ARC = aTokenFetchResultMap["ARC"];
     isConfigChanged = aTokenFetchResultMap["IsConfigChanged"];
     isForceApplyPins = aTokenFetchResultMap["IsForceApplyPins"];
-    measurementConfig = aTokenFetchResultMap["MeasurementConfig"];
+    Uint8List? newMeasurementConfig = aTokenFetchResultMap["MeasurementConfig"];
+    if (newMeasurementConfig != null)
+      measurementConfig = newMeasurementConfig;
     loggableToken = aTokenFetchResultMap["LoggableToken"];
   }
 }
@@ -102,7 +107,7 @@ class ApproovService {
   /// @param dynamicConfig is any dynamic update configuration string or null if there is none
   /// @param reserved is provided for future usage
   /// @throws Exception if the provided configuration is not valid
-  static Future<void> initialize(String initialConfig, String dynamicConfig, String reserved) async {
+  static Future<void> initialize(String initialConfig, String? dynamicConfig, String? reserved) async {
     final Map<String, dynamic> arguments = <String, dynamic>{
       "initialConfig": initialConfig,
       "dynamicConfig": dynamicConfig,
@@ -327,7 +332,7 @@ class ApproovService {
 
   // any header to be used for binding in Approov tokens or null if not set
   // TODO why is this not static in other integrations?
-  static String bindingHeader; // TODO? Make this client-specific
+  static String? bindingHeader; // TODO? Make this client-specific
 
   /// Initializes Approov-Flutter.
   ///
@@ -346,7 +351,7 @@ class ApproovService {
       Log.e("$TAG: Approov initial configuration read failed: ${e.toString()}");
       return;
     }
-    String dynamicConfig = await getApproovDynamicConfig();
+    String? dynamicConfig = await getApproovDynamicConfig();
     // initialize the Approov SDK
     try {
       await initialize(initialConfig, dynamicConfig, null);
@@ -398,9 +403,9 @@ class ApproovService {
   /// The default implementation retrieves the string from shared preferences.
   ///
   /// @return config string, or null if not present
-  static Future<String> getApproovDynamicConfig() async {
+  static Future<String?> getApproovDynamicConfig() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String dynamicConfig = prefs.getString(APPROOV_CONFIG);
+    String? dynamicConfig = prefs.getString(APPROOV_CONFIG);
     return dynamicConfig;
   }
 
@@ -429,9 +434,10 @@ class ApproovService {
     }
 
     // update the data hash based on any token binding header
-    if (bindingHeader != null) {
-      String headerValue = request.headers.value(bindingHeader);
-      if (headerValue == null) throw Exception("Approov missing token binding header: " + bindingHeader);
+    String? bh = bindingHeader;
+    if (bh != null) {
+      String? headerValue = request.headers.value(bh);
+      if (headerValue == null) throw Exception("Approov missing token binding header: " + bh);
       setDataHashInToken(headerValue);
     }
 
@@ -464,7 +470,7 @@ class ApproovService {
   }
 
   // The cached host certificates
-  static Map<String, List<Uint8List>> _hostCertificates = Map<String, List<Uint8List>>();
+  static Map<String, List<Uint8List>?> _hostCertificates = Map<String, List<Uint8List>>();
 
   /// Retrieves the certificates for the specified host. These are cached in the native part of the Flutter-Approov
   /// plugin, so normally do not require communication over the network to retrieve them.
@@ -472,16 +478,16 @@ class ApproovService {
   /// @param host is the URL specifying the host for which to retrieve the certificates (e.g. "www.example.com")
   /// @return a list of certificates (each as a Uint8list) for the host specified in the URL, null if an error occurred,
   /// or an empty list if no suitable certificates are available.
-  static Future<List<Uint8List>> getHostCertificates(Uri url) async {
+  static Future<List<Uint8List>?> getHostCertificates(Uri url) async {
     final Map<String, dynamic> arguments = <String, dynamic>{
       "url": url.toString(),
     };
-    List<Uint8List> hostCertificates = _hostCertificates[url.host];
+    List<Uint8List>? hostCertificates = _hostCertificates[url.host];
     if (hostCertificates == null) {
       try {
         List fetchedHostCertificates = await _channel.invokeMethod('fetchHostCertificates', arguments);
         if (fetchedHostCertificates != null && fetchedHostCertificates.length != 0) {
-          hostCertificates = List<Uint8List>();
+          hostCertificates = [];
           for (final cert in fetchedHostCertificates) {
             hostCertificates.add(cert as Uint8List);
           }
@@ -552,13 +558,13 @@ class ApproovService {
     List<Uint8List> hostCertificates = await ApproovService.getHostCertificates(url) as List<Uint8List>;
     if (hostCertificates == null) {
       Log.e("$TAG: Cannot get certificates for host of URL $url");
-      return List();
+      return [];
     }
 
     // Collect only those certificates for pinning that match the Approov pins
-    List<Uint8List> hostPinCerts = List();
+    List<Uint8List> hostPinCerts = [];
     for (final cert in hostCertificates) {
-      Uint8List serverSpkiSha256Digest = _spkiSha256Digest(cert).bytes;
+      Uint8List serverSpkiSha256Digest = Uint8List.fromList(_spkiSha256Digest(cert).bytes);
       for (final pin in approovPins) {
         if (ListEquality().equals(base64.decode(pin), serverSpkiSha256Digest)) {
           hostPinCerts.add(cert);
@@ -592,7 +598,7 @@ class ApproovHttpClient implements HttpClient {
   static const String TAG = "ApproovHttpClient";
 
   // The name of the header used for transmitting the Approov token
-  String _approovHeader = null;
+  String? _approovHeader = null;
 
   // Set the name of the header used for transmitting the Approov token
   // @param header the name of the header. Only Approov-Token or X-Approov-Token are allowed.
@@ -612,15 +618,18 @@ class ApproovHttpClient implements HttpClient {
 
   // The host to which the inner HttpClient delegate is connected and, optionally, pinning. Used to detect when to
   // re-create the inner HttpClient.
-  String _connectedHost;
+  String? _connectedHost;
+
+  // Indicates whether the ApproovHttpClient has been closed by calling close().
+  bool _isClosed = false;
 
   // State required to implement getters and setters required by the HttpClient interface
-  Future<bool> Function(Uri url, String scheme, String realm) _authenticate;
+  Future<bool> Function(Uri url, String scheme, String realm)? _authenticate;
   final List _credentials = [];
-  String Function(Uri url) _findProxy;
-  Future<bool> Function(String host, int port, String scheme, String realm) _authenticateProxy;
+  String Function(Uri url)? _findProxy;
+  Future<bool> Function(String host, int port, String scheme, String realm)? _authenticateProxy;
   final List _proxyCredentials = [];
-  bool Function(X509Certificate cert, String host, int port) _badCertificateCallback;
+  bool Function(X509Certificate cert, String host, int port)? _badCertificateCallback;
 
   /// Certificate check function for the badCertificateCallback of HttpClient. This is called if the pinning
   /// certificate check failed, which can indicate a certificate update on the server or a Man-in-the-Middle (MitM)
@@ -633,9 +642,10 @@ class ApproovHttpClient implements HttpClient {
   /// @param host is the host name of the server to which the request is being sent
   /// @param port is the port of the server
   bool certificateCheck(X509Certificate cert, String host, int port) {
-    if (_badCertificateCallback != null) {
+    Function(X509Certificate cert, String host, int port)? badCertificateCallback = _badCertificateCallback;
+    if (badCertificateCallback != null) {
       // Call the original function for its side effects
-      _badCertificateCallback(cert, host, port);
+      badCertificateCallback(cert, host, port);
     }
 
     // Reset host certificates and inner HttpClient to force them to be recreated
@@ -653,7 +663,7 @@ class ApproovHttpClient implements HttpClient {
     // Get pins from Approov
     Map pins = await ApproovService.getPins("public-key-sha256");
 
-    HttpClient httpClient;
+    HttpClient? httpClient;
     if (pins == null || pins[url.host] == null || (pins[url.host] as List).isEmpty) {
       // There are no pins set in Approov. This client does not check pinning
       httpClient = HttpClient();
@@ -672,51 +682,59 @@ class ApproovHttpClient implements HttpClient {
     _connectedHost = url.host;
 
     // Copy state from previous inner HttpClient to the new one
-    httpClient.idleTimeout = _inner.idleTimeout;
-    httpClient.connectionTimeout = _inner.connectionTimeout;
-    httpClient.maxConnectionsPerHost = _inner.maxConnectionsPerHost;
-    httpClient.autoUncompress = _inner.autoUncompress;
-    httpClient.authenticate = _authenticate;
-    for (var credential in _credentials) {
-      httpClient.addCredentials(credential[0], credential[1], credential[2]);
+    HttpClient? inner = _inner;
+    if (inner != null) {
+      httpClient.idleTimeout = inner.idleTimeout;
+      httpClient.connectionTimeout = inner.connectionTimeout;
+      httpClient.maxConnectionsPerHost = inner.maxConnectionsPerHost;
+      httpClient.autoUncompress = inner.autoUncompress;
+      httpClient.authenticate = _authenticate;
+      for (var credential in _credentials) {
+        httpClient.addCredentials(credential[0], credential[1], credential[2]);
+      }
+      httpClient.findProxy = _findProxy;
+      httpClient.authenticateProxy = _authenticateProxy;
+      for (var proxyCredential in _proxyCredentials) {
+        httpClient.addProxyCredentials(
+            proxyCredential[0], proxyCredential[1], proxyCredential[2], proxyCredential[3]);
+      }
+      httpClient.badCertificateCallback = certificateCheck;
     }
-    httpClient.findProxy = _findProxy;
-    httpClient.authenticateProxy = _authenticateProxy;
-    for (var proxyCredential in _proxyCredentials) {
-      httpClient.addProxyCredentials(
-          proxyCredential[0], proxyCredential[1], proxyCredential[2], proxyCredential[3]);
-    }
-
-    httpClient.badCertificateCallback = certificateCheck;
     return httpClient;
   }
 
   @override
   Future<HttpClientRequest> open(String method, String host, int port, String path) async {
-    if (_connectedHost != host) {
+    if (!_isClosed && _connectedHost != host) {
       Uri url = Uri(scheme: "https", host: host, port: port, path: path);
       HttpClient httpClient = await _createApproovHttpClient(url);
       _inner.close();
       _inner = httpClient;
     }
     HttpClientRequest httpClientRequest = await _inner.open(method, host, port, path);
-    if (_approovHeader == null)
-      _approovHeader = ApproovService.APPROOV_HEADER;
-    await ApproovService.addApproovToHttpClientRequest(httpClientRequest, approovHeader: _approovHeader);
+    if (!_isClosed) {
+      String? approovHeader = _approovHeader;
+      if (approovHeader == null)
+        approovHeader = ApproovService.APPROOV_HEADER;
+      await ApproovService.addApproovToHttpClientRequest(httpClientRequest, approovHeader: approovHeader);
+    }
     return httpClientRequest;
   }
 
   @override
   Future<HttpClientRequest> openUrl(String method, Uri url) async {
-    if (_connectedHost != url.host) {
+    if (!_isClosed && _connectedHost != url.host) {
       HttpClient httpClient = await _createApproovHttpClient(url);
       _inner.close();
       _inner = httpClient;
     }
     HttpClientRequest httpClientRequest = await _inner.openUrl(method, url);
-    if (_approovHeader == null)
-      _approovHeader = ApproovService.APPROOV_HEADER;
-    await ApproovService.addApproovToHttpClientRequest(httpClientRequest, approovHeader: _approovHeader);
+    if (!_isClosed) {
+      String? approovHeader = _approovHeader;
+      if (approovHeader == null)
+        approovHeader = ApproovService.APPROOV_HEADER;
+      await ApproovService.addApproovToHttpClientRequest(httpClientRequest, approovHeader: approovHeader);
+    }
     return httpClientRequest;
   }
 
@@ -762,14 +780,14 @@ class ApproovHttpClient implements HttpClient {
   Duration get idleTimeout => _inner.idleTimeout;
 
   @override
-  set connectionTimeout(Duration timeout) => _inner.connectionTimeout = timeout;
+  set connectionTimeout(Duration? timeout) => _inner.connectionTimeout = timeout;
   @override
-  Duration get connectionTimeout => _inner.connectionTimeout;
+  Duration? get connectionTimeout => _inner.connectionTimeout;
 
   @override
-  set maxConnectionsPerHost(int maxConnections) => _inner.maxConnectionsPerHost = maxConnections;
+  set maxConnectionsPerHost(int? maxConnections) => _inner.maxConnectionsPerHost = maxConnections;
   @override
-  int get maxConnectionsPerHost => _inner.maxConnectionsPerHost;
+  int? get maxConnectionsPerHost => _inner.maxConnectionsPerHost;
 
   @override
   set autoUncompress(bool autoUncompress) => _inner.autoUncompress = autoUncompress;
@@ -777,12 +795,12 @@ class ApproovHttpClient implements HttpClient {
   bool get autoUncompress => _inner.autoUncompress;
 
   @override
-  set userAgent(String userAgent) => _inner.userAgent = userAgent;
+  set userAgent(String? userAgent) => _inner.userAgent = userAgent;
   @override
-  String get userAgent => _inner.userAgent;
+  String? get userAgent => _inner.userAgent;
 
   @override
-  set authenticate(Future<bool> f(Uri url, String scheme, String realm)) {
+  set authenticate(Future<bool> f(Uri url, String scheme, String realm)?) {
     _authenticate = f;
     _inner.authenticate = f;
   }
@@ -794,13 +812,13 @@ class ApproovHttpClient implements HttpClient {
   }
 
   @override
-  set findProxy(String f(Uri url)) {
+  set findProxy(String f(Uri url)?) {
     _findProxy = f;
     _inner.findProxy = f;
   }
 
   @override
-  set authenticateProxy(Future<bool> f(String host, int port, String scheme, String realm)) {
+  set authenticateProxy(Future<bool> f(String host, int port, String scheme, String realm)?) {
     _authenticateProxy = f;
     _inner.authenticateProxy = f;
   }
@@ -812,7 +830,7 @@ class ApproovHttpClient implements HttpClient {
   }
 
   @override
-  set badCertificateCallback(bool callback(X509Certificate cert, String host, int port)) {
+  set badCertificateCallback(bool callback(X509Certificate cert, String host, int port)?) {
     _badCertificateCallback = callback;
     _inner.badCertificateCallback = certificateCheck;
   }
@@ -821,7 +839,7 @@ class ApproovHttpClient implements HttpClient {
   void close({bool force: false}) async {
     if (_inner != null) {
       _inner.close(force: force);
-      _inner = null;
+      _isClosed = true;
     }
   }
 }
@@ -833,7 +851,7 @@ class ApproovHttpClient implements HttpClient {
 // and adds the desired behavior.
 class ApproovClient extends http.BaseClient {
   // Internal client delegate
-  http.Client _inner;
+  http.Client? _inner;
 
   // The name of the header used for transmitting the Approov token
   String _approovHeader = ApproovService.APPROOV_HEADER;
@@ -853,18 +871,21 @@ class ApproovClient extends http.BaseClient {
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) {
-    if (_inner == null) {
+    http.Client? inner = _inner;
+    if (inner == null) {
       ApproovHttpClient httpClient = ApproovHttpClient();
       httpClient.approovHeader = _approovHeader;
-      _inner = httpio.IOClient(httpClient);
+      inner = httpio.IOClient(httpClient);
+      _inner = inner;
     }
-    return _inner.send(request);
+    return inner.send(request);
   }
 
   @override
   void close() {
-    if (_inner != null) {
-      _inner.close();
+    http.Client? inner = _inner;
+    if (inner != null) {
+      inner.close();
       _inner = null;
     }
   }
