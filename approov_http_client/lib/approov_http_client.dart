@@ -200,7 +200,8 @@ class ApproovService {
     try {
       await ensureInitialized();
       Map tokenFetchResultMap = await _channel.invokeMethod('fetchApproovTokenAndWait', arguments);
-      return TokenFetchResult.fromTokenFetchResultMap(tokenFetchResultMap);
+      TokenFetchResult tokenFetchResult = TokenFetchResult.fromTokenFetchResultMap(tokenFetchResultMap);
+      return tokenFetchResult;
     } catch (err) {
       throw Exception('$err');
     }
@@ -555,7 +556,7 @@ class ApproovService {
   /// @return a list of host certificates that match the Approov pins
   static Future<List<Uint8List>> _hostPinCertificates(Uri url, Set<String> approovPins) async {
     // Get certificates for host
-    List<Uint8List> hostCertificates = await ApproovService.getHostCertificates(url) as List<Uint8List>;
+    List<Uint8List>? hostCertificates = await ApproovService.getHostCertificates(url);
     if (hostCertificates == null) {
       Log.e("$TAG: Cannot get certificates for host of URL $url");
       return [];
@@ -608,7 +609,7 @@ class ApproovHttpClient implements HttpClient {
           " ${ApproovService.X_APPROOV_HEADER}";
     }
     if (_approovHeader != null) {
-      throw "ApproovClient: Must not change Approov header after sending request";
+      throw "ApproovHttpClient: Must not change Approov header after sending request";
     }
     _approovHeader = header;
   }
@@ -660,7 +661,12 @@ class ApproovHttpClient implements HttpClient {
   /// @param host for which to set up pinning
   /// @return the new HTTP client
   Future<HttpClient> _createApproovHttpClient(Uri url) async {
-    // Get pins from Approov
+    // Get pins from Approov, ensuring that they are up to date
+    TokenFetchResult approovResults = await ApproovService.fetchApproovToken(url.host);
+    if (approovResults.isConfigChanged) {
+      ApproovService.updateDynamicConfig();
+      ApproovService.removeAllCertificates();
+    }
     Map pins = await ApproovService.getPins("public-key-sha256");
 
     HttpClient? httpClient;
@@ -711,6 +717,7 @@ class ApproovHttpClient implements HttpClient {
       _inner.close();
       _inner = httpClient;
     }
+    // This will throw if this HTTP client's close() method has been called previously
     HttpClientRequest httpClientRequest = await _inner.open(method, host, port, path);
     if (!_isClosed) {
       String? approovHeader = _approovHeader;
@@ -728,6 +735,7 @@ class ApproovHttpClient implements HttpClient {
       _inner.close();
       _inner = httpClient;
     }
+    // This will throw if this HTTP client's close() method has been called previously
     HttpClientRequest httpClientRequest = await _inner.openUrl(method, url);
     if (!_isClosed) {
       String? approovHeader = _approovHeader;
@@ -850,8 +858,11 @@ class ApproovHttpClient implements HttpClient {
 // behavior to it. Libraries wishing to add behavior should create a subclass of BaseClient that wraps an ApproovClient
 // and adds the desired behavior.
 class ApproovClient extends http.BaseClient {
+  // logging tag
+  static const String TAG = "ApproovClient";
+
   // Internal client delegate
-  http.Client? _inner;
+  http.Client? _inner = null;
 
   // The name of the header used for transmitting the Approov token
   String _approovHeader = ApproovService.APPROOV_HEADER;
@@ -877,6 +888,9 @@ class ApproovClient extends http.BaseClient {
       httpClient.approovHeader = _approovHeader;
       inner = httpio.IOClient(httpClient);
       _inner = inner;
+    }
+    if (inner == null) {
+      throw "ApproovClient: Cannot send using null HTTP client";
     }
     return inner.send(request);
   }
