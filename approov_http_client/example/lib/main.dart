@@ -64,7 +64,7 @@ class _ShapesState extends State<Shapes> {
     // Create a client
     try {
       http.Client client = http.Client();
-      http.Response response = await client.get(HELLO_URL);
+      http.Response response = await client.get(Uri.parse(HELLO_URL));
       if (response.statusCode == 200) {
         Log.i("$TAG: Received a hello response from the Approov shapes server: ${utf8.decode(response.bodyBytes)}");
         _statusText = '${response.statusCode}: ${response.reasonPhrase}';
@@ -97,7 +97,7 @@ class _ShapesState extends State<Shapes> {
       // *** UNCOMMENT THE LINE BELOW FOR APPROOV (and comment out the line above) ***
       // http.Client client = ApproovClient();
 
-      http.Response response = await client.get(SHAPE_URL);
+      http.Response response = await client.get(Uri.parse(SHAPE_URL));
       if (response.statusCode == 200) {
         Log.i("$TAG: Received a shape response from the Approov shapes server: ${utf8.decode(response.bodyBytes)}");
         Map<String, dynamic> json = jsonDecode(response.body);
