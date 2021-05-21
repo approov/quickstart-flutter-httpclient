@@ -17,6 +17,8 @@ This quickstart is written specifically for Android and iOS apps that are implem
 
 The Shapes App is a simple Flutter application which demonstrates using the [Client class](https://pub.dev/documentation/http/latest/http/Client-class.html) of the Flutter [http package](https://pub.dev/packages/http) and the [HttpClient class](https://api.dart.dev/stable/2.10.1/dart-io/HttpClient-class.html) of the Dart [IO library](https://api.dart.dev/stable/2.10.1/dart-io/dart-io-library.html) to make HTTP requests.
 
+Before building the Flutter Shapes app, make sure that your system is set up for Flutter development by following the instructions at [Flutter Get Started](https://flutter.dev/docs/get-started/install).
+
 <p>
     <img src="readme-images/flutter-shapes-app-start.png" width="256" title="Shapes App">
 </p>
@@ -53,8 +55,6 @@ A successful _shapes_ request to `/v1/shapes` returns one of four possible shape
     <img src="readme-images/flutter-shape-rectangle.png" width="256" title="Rectangle">
 </a>
 
-Before building the Flutter Shapes app, make sure that your system is set up for Flutter development by following the instructions at [Flutter Get Started](https://flutter.dev/docs/get-started/install).
-
 ### Running the App
 
 To run the app on an attached device, open a shell terminal at the `quickstart-flutter-httpclient/approov_http_client/example` directory and type:
@@ -62,7 +62,13 @@ To run the app on an attached device, open a shell terminal at the `quickstart-f
 ```
 $ flutter run
 ```
-For Android: if the Android build fails with `Manifest merger failed : Attribute application@label value=([...]) from AndroidManifest.xml:11:9-46 is also present at [approov-sdk.aar] AndroidManifest.xml:12:9-41 value=(@string/app_name)`, then open `quickstart-flutter-httpclient/approov_http_client/example/android/app/src/main/AndroidManifest.xml` in an editor and make the following changes.
+
+You should now be able to use the app to say hello and get shapes.
+
+See the following sections if you have a problem with building or running.
+
+### Android Potential Issues
+If the Android build fails with `Manifest merger failed : Attribute application@label value=([...]) from AndroidManifest.xml:11:9-46 is also present at [approov-sdk.aar] AndroidManifest.xml:12:9-41 value=(@string/app_name)`, then open `quickstart-flutter-httpclient/approov_http_client/example/android/app/src/main/AndroidManifest.xml` in an editor and make the following changes.
 
 - Add the schema as an attribute in the `manifest` tag:
 
@@ -79,8 +85,12 @@ For Android: if the Android build fails with `Manifest merger failed : Attribute
         ... >
 ```
 
-For iOS: if the iOS build or run step fail with a signing error, open the Xcode project located in `
-quickstart-flutter-httpclient/approov_http_client/example/ios/Runner.xcworkspace`:
+### iOS Potential Issues
+
+If the iOS build fails with an error related to `Pods-Runner` then navigate inside `ios` folder using `cd ios` and run `pod install`.
+
+If the iOS build fails with a signing error, open the Xcode project located in `quickstart-flutter-httpclient/approov_http_client/example/ios/Runner.xcworkspace`:
+
 ```
 $ open ios/Runner.xcworkspace
 ```
@@ -88,9 +98,6 @@ $ open ios/Runner.xcworkspace
 and select your code signing team in the _Signing & Capabilities_ section of the project.
 
 Also ensure you modify the app's `Bundle Identifier` so it contains a unique string (you can simply append your company name). This is to avoid Apple rejecting a duplicate `Bundle Identifier` when code signing is performed. Then return to the shell and repeat the failed build step.
-
-You should now be able to use the app to say hello and get shapes.
-
 
 ## ADDING APPROOV SUPPORT
 
