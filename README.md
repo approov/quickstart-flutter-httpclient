@@ -118,12 +118,12 @@ Android SDK library 2.3.0(2726) written to android/approov-sdk.aar
 
 For iOS:
 ```
-$ approov sdk -getLibrary ios/approov.xcframework
+$ approov sdk -getLibrary ios/Approov.xcframework
 ```
-This will write the Approov SDK into `approov.xcframework` in the correct location in the plugin. On success, the tool outputs a message similar to this:
+This will write the Approov SDK into `Approov.xcframework` in the correct location in the plugin. On success, the tool outputs a message similar to this:
 
 ```
-$ iOS SDK library 2.6.0(5851) written to ios/approov.xcframework
+$ iOS SDK library 2.6.0(5851) written to ios/Approov.xcframework
 ```
 
 ### Set up an Initial Approov Configuration
