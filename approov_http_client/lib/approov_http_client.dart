@@ -471,7 +471,7 @@ class ApproovService {
   }
 
   // The cached host certificates
-  static Map<String, List<Uint8List>?> _hostCertificates = Map<String, List<Uint8List>>();
+  static Map<String, List<Uint8List>?> _hostCertificates = Map<String, List<Uint8List>?>();
 
   /// Retrieves the certificates for the specified host. These are cached in the native part of the Flutter-Approov
   /// plugin, so normally do not require communication over the network to retrieve them.
