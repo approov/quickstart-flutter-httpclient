@@ -101,6 +101,8 @@ Also ensure you modify the app's `Bundle Identifier` so it contains a unique str
 
 ## ADDING APPROOV SUPPORT
 
+The following sections describe how to use the example included in the Quickstart's approov_http_client plugin directory (`quickstart-flutter-httpclient/approov_http_client/example`) and we recommend that you go through this first, before attempting an Approov integration into your own app. For instructions specific to an app integration, plese refer to section [Approov in Your Own App](#approov-in-your-own-app).
+
 ### Add the Latest Approov SDK
 
 The underlying Approov SDK itself is not shipped as part of the `approov_http_client` module. To get the latest version of the SDK, use the [`approov` command line tool](https://approov.io/docs/latest/approov-installation/). In a terminal shell in your `quickstart-flutter-httpclient/approov_http_client` directory, type:
@@ -275,6 +277,84 @@ If you have a trial (as opposed to demo) account you have some additional option
 * Consider using an [Annotation Policy](https://approov.io/docs/latest/approov-usage-documentation/#annotation-policies) during development to directly see why the device is not being issued with a valid token.
 * Use `approov metrics` to see [Live Metrics](https://approov.io/docs/latest/approov-usage-documentation/#live-metrics) of the cause of failure.
 * You can use a debugger and get valid Approov tokens on a specific device by [whitelisting](https://approov.io/docs/latest/approov-usage-documentation/#adding-a-device-security-policy).
+
+
+## APPROOV IN YOUR OWN APP
+
+This section describes how to integrate Approov into your own app. The process is quite similar to the example described above in [Adding Approov Support](#adding-approov-support) except for how to obtain the plugin and its install location relative to the app project directory.
+
+### Get the Approov HTTP Client Plugin
+
+In a terminal shell in your main app project directory, run the command:
+```
+$ git clone https://github.com/approov/quickstart-flutter-httpclient.git approov/http-client
+```
+This will create a copy of this quickstart which contains the Approov HTTP Client plugin, such that the plugin is located at `./approov/http-client/approov_http_client` relative to your app project directory. The path `approov/http-client` relative to the app project directory for the plugin is an example, if you use a different path, please make sure to adjust the path in the remainder of this section.
+
+### Add the Latest Approov SDK
+
+To get the latest version of the SDK, use the [`approov` command line tool](https://approov.io/docs/latest/approov-installation/). In a terminal shell in your main app project directory, run this command for Android:
+```
+$ approov sdk -getLibrary approov/http-client/approov_http_client/android/approov-sdk.aar
+```
+or for iOS
+```
+$ approov sdk -getLibrary approov/http-client/approov_http_client/ios/Approov.xcframework
+```
+
+### Set up an Initial Approov Configuration
+
+In a terminal shell in your main app project directory, use the approov command-line tool to fetch a configuration file:
+```
+$ approov sdk -getConfig approov-initial.config
+```
+
+### Add the Approov HTTP Client Flutter Plugin to Your App
+
+In your app's `pubspec.yaml` configuration file
+
+1. Add the dependency for the approov_http_client plugin (under `dependencies:`)
+```
+  approov_http_client:
+    path: ./approov/http-client/approov_http_client/
+```
+
+2. Add the initial approov configuration to the app's assets (under `assets:`)
+```
+    - approov-initial.config
+```
+
+Import and use the Approov HTTP Client plugin in your code as demonstrated in the quickstart example above.
+
+1. Import the approov_http_client package
+```
+import 'package:approov_http_client/approov_http_client.dart';
+```
+
+2. Create an HTTP Client.
+```
+client = ApproovClient();
+```
+
+### Add Protected APIs
+
+Don't forget to add any APIs that should be protected by Approov (this only needs to be done once). For example:
+```
+$ approov api -add myapi.example.com
+```
+
+### Register Your App With Approov
+
+Once your app is built, register the app with the Approov service, so it can be recognized as a genuine app for which valid Approov tokens will be issued (registrations take up to 30s to become active).
+
+For Android:
+```
+$ approov registration -add myapp.apk
+```
+For iOS:
+```
+$ approov registration -add myapp.ipa
+```
 
 
 ## USING TOKEN BINDING
