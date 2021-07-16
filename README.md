@@ -101,7 +101,7 @@ Also ensure you modify the app's `Bundle Identifier` so it contains a unique str
 
 ## ADDING APPROOV SUPPORT
 
-The following sections describe how to use the example included in the Quickstart's approov_http_client plugin directory (`quickstart-flutter-httpclient/approov_http_client/example`) and we recommend that you go through this first, before attempting an Approov integration into your own app. For instructions specific to an app integration, plese refer to section "Approov in your own app".
+The following sections describe how to use the example included in the Quickstart's approov_http_client plugin directory (`quickstart-flutter-httpclient/approov_http_client/example`) and we recommend that you go through this first, before attempting an Approov integration into your own app. For instructions specific to an app integration, plese refer to section [Approov in Your Own App](#approov-in-your-own-app).
 
 ### Add the Latest Approov SDK
 
@@ -281,13 +281,15 @@ If you have a trial (as opposed to demo) account you have some additional option
 
 ## APPROOV IN YOUR OWN APP
 
+This section describes how to integrate Approov into your own app. The process is quite similar to the example described above in [Adding Approov Support](#adding-approov-support) except for how to obtain the plugin and its install location relative to the app project directory.
+
 ### Get the Approov HTTP Client Plugin
 
 In a terminal shell in your main app project directory, run the command:
 ```
 $ git clone https://github.com/approov/quickstart-flutter-httpclient.git approov/http-client
 ```
-This will create a copy of this quickstart, where the Approov HTTP Client plugin is located at `./approov/http-client/approov_http_client` relative to your app project directory. The path `approov/http-client` relative to the app project directory for the plugin is an example, if you use a different path, please make sure to adjust the path in the remainder of this section.
+This will create a copy of this quickstart which contains the Approov HTTP Client plugin, such that the plugin is located at `./approov/http-client/approov_http_client` relative to your app project directory. The path `approov/http-client` relative to the app project directory for the plugin is an example, if you use a different path, please make sure to adjust the path in the remainder of this section.
 
 ### Add the Latest Approov SDK
 
