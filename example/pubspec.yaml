@@ -15,19 +15,21 @@ dependencies:
     sdk: flutter
   http: ^0.13.2
   logger: ^1.0.0
+  
 
   # When depending on this package from a real application you should use:
-  #   approov_http_client: ^x.y.z
+  #   approov_service_flutter_httpclient: ^x.y.z
   # See https://dart.dev/tools/pub/dependencies#version-constraints
   # The example app is bundled with the plugin so we use a path dependency on
   # the parent directory to use the current plugin's version.
   # *** UNCOMMENT THE SECTION BELOW FOR APPROOV ***
-  # approov_http_client:
-  #   path: ../
+  approov_service_flutter_httpclient:
+     git: https://github.com/approov/approov_service_flutter_httpclient.git
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
+  mutex: ^3.0.0
 
 dev_dependencies:
   flutter_test:
