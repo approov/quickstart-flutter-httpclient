@@ -25,11 +25,11 @@ import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart'; // https://pub.dev/packages/logger
 
 // *** UNCOMMENT THE LINE BELOW FOR APPROOV ***
-import 'package:approov_service_flutter_httpclient/approov_service_flutter_httpclient.dart';
+//import 'package:approov_service_flutter_httpclient/approov_service_flutter_httpclient.dart';
 
 // Shapes server URLs
 // API v1 is unprotected; API v2 is protected by Approov
-const String API_VERSION = 'v2';
+const String API_VERSION = 'v1';
 const String HELLO_URL = "https://shapes.approov.io/$API_VERSION/hello";
 const String SHAPE_URL = "https://shapes.approov.io/$API_VERSION/shapes";
 
@@ -95,10 +95,9 @@ class _ShapesState extends State<Shapes> {
     });
     try {
       // Create a client
-      //http.Client client = http.Client();
+      http.Client client = http.Client();
       // *** UNCOMMENT THE LINE BELOW FOR APPROOV (and comment out the line above) ***
-      http.Client client = ApproovClient(
-          '#cb-ivol#mAxOF0ekJUOC36J5XWmVmVipOcUoEdMjhPSp2FVtyTo=');
+      //http.Client client = ApproovClient('<enter-your-config-string-here>');
 
       http.Response response = await client.get(Uri.parse(SHAPE_URL));
       if (response.statusCode == 200) {
