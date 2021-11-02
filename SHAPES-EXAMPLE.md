@@ -135,6 +135,8 @@ import 'package:approov_service_flutter_httpclient/approov_service_flutter_httpc
 client = ApproovClient('<enter-your-config-string-here>');
 ```
 
+The `<enter-your-config-string-here>` is a custom string that configures your Approov account access. This will have been provided in your Approov onboarding email.
+
 ### Select the Correct Shapes Endpoint
 
 The Shapes server provides the app with shapes using multiple versions of an API: version 1 (https://shapes.approov.io/v1/shapes) which is _not_ protected by Approov, and version 2 (https://shapes.approov.io/v2/shapes) which _is_ protected by Approov.
