@@ -17,6 +17,14 @@ approov_service_flutter_httpclient:
 
 This package is actually an open source wrapper layer that allows you to easily use Approov with `Flutter`. This has a further dependency to the closed source [Android Approov SDK](https://github.com/approov/approov-android-sdk) and [iOS Approov SDK](https://github.com/approov/approov-ios-sdk) packages. Those are automatically added as dependencies for the platform specific targets.
 
+The `approov_service_flutter_httpclient` package declares four classes:
+
+1. ApproovService and TokenFetchResult provide the SDK native binding
+2. ApproovHttpClient which is a drop-in replacement for the Dart IO library's HttpClient and calls the ApproovService
+3. ApproovClient which is a drop-in replacement for Client from the Flutter http package (https://pub.dev/packages/http)
+    and uses internally an ApproovHttpClient object
+
+
 ### ANDROID
 
 The `approov_service_flutter_httpclient` adds an additional repository to the `build.gradle` project file:
