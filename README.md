@@ -27,7 +27,7 @@ The `approov_service_flutter_httpclient` package declares four classes:
 
 ### ANDROID
 
-The `approov_service_flutter_httpclient` adds an additional repository to the `build.gradle` project file:
+The `approov_service_flutter_httpclient` indirectly adds an additional repository to the project files:
 
 ```gradle
 maven { url 'https://jitpack.io' }
@@ -40,7 +40,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.14.2'
     implementation 'com.github.approov:approov-android-sdk:2.7.0'
 }
-```
+``` 
 
 ### ANDROID MANIFEST CHANGES
 
@@ -64,6 +64,18 @@ pod install
 ```
 
 in the directory containing the ios project files.
+
+### BUILD ISSUES
+
+If an error is reported during the application build complaining about a function parameter mismatch like this:
+
+```Bash
+approov_service_flutter_httpclient.dart:913:33: Error: The parameter 'f' of the method 'ApproovHttpClient.authenticate' has type 'Future<bool> Function(Uri, String, String?)?', which does not match the corresponding type, 'Future<bool> Function(Uri, String, String)?', in the overridden method, 'HttpClient.authenticate'.
+ - 'Future' is from 'dart:async'.
+ - 'Uri' is from 'dart:core'.
+```
+
+please ensure your version of flutter is at least `2.5.3` and if you have recently updated `flutter` please update the dart libraries by executing `dart pub cache clean` which should clean the cache before running `flutter pub get` and updating your application dependencies.
 
 ## INITIALIZING APPROOV SERVICE
 
