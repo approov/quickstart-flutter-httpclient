@@ -37,24 +37,6 @@ On a successful _hello_ request to `/v1/hello`, the client app will say hello wi
     <img src="readme-images/flutter-shapes-app-fail.png" width="256" title="Shapes App Fail">
 </a>
 
-A successful _shapes_ request to `/v1/shapes` returns one of four possible shapes:
-
-<a>
-    <img src="readme-images/flutter-shape-triangle.png" width="256" title="Triangle">
-</a>
-
-<a>
-    <img src="readme-images/flutter-shape-circle.png" width="256" title="Circle">
-</a>
-
-<a>
-    <img src="readme-images/flutter-shape-square.png" width="256" title="Square">
-</a>
-
-<a>
-    <img src="readme-images/flutter-shape-rectangle.png" width="256" title="Rectangle">
-</a>
-
 ### Running the App
 
 To run the app on an attached device, open a shell terminal at the `quickstart-flutter-httpclient/example` directory and type:
@@ -141,7 +123,7 @@ The `<enter-your-config-string-here>` is a custom string that configures your Ap
 
 ### Select the Correct Shapes Endpoint
 
-The Shapes server provides the app with shapes using multiple versions of an API: version 1 (https://shapes.approov.io/v1/shapes) which is _not_ protected by Approov, and version 2 (https://shapes.approov.io/v2/shapes) which _is_ protected by Approov.
+The Shapes server provides the app with shapes using multiple versions of an API. Version 2 (https://shapes.approov.io/v2/shapes) requires a valid Approov token to be passed in the request.
 
 Now that we’re using Approov, let’s switch to use version 2 of the Shapes API. Edit the Dart source in `quickstart-flutter-httpclient/example/lib/main.dart` find the line of code:
 
@@ -202,14 +184,25 @@ $ approov registration -add ../../Runner\ 2021-02-04\ 14-27-30/ApproovHttpClient
 
 Wait for the registration to propagate to the Approov service. This can take up to 30 seconds.
 
-Then restart the application on your device to flush out any bad tokens, tap _Shape_ and you should see:
+Then restart the application on your device to flush out any bad tokens, tap _Shape_ and you should see one of four possible shapes:
 
-<p>
-    <img src="readme-images/flutter-shape-triangle.png" width="256" title="Success">
-</p>
+<a>
+    <img src="readme-images/flutter-shape-triangle.png" width="256" title="Triangle">
+</a>
 
-or any of the four possible shapes returned by the server. Congratulations, your API is now Approoved!
+<a>
+    <img src="readme-images/flutter-shape-circle.png" width="256" title="Circle">
+</a>
 
+<a>
+    <img src="readme-images/flutter-shape-square.png" width="256" title="Square">
+</a>
+
+<a>
+    <img src="readme-images/flutter-shape-rectangle.png" width="256" title="Rectangle">
+</a>
+
+Congratulations, your API is now Approoved!
 
 ## WHAT IF I DON'T GET SHAPES
 
