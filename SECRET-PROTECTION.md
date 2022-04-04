@@ -116,9 +116,10 @@ Here is an example of calling the appropriate method in `ApproovService`:
 ```Dart
 String key;
 String? newDef;
+String? secret;
 // define key and newDef here
 try {
-    String? secret = await ApproovService.fetchSecureString(key, newDef);
+    secret = await ApproovService.fetchSecureString(key, newDef);
 }
 on ApproovRejectionException catch(e) {
     // failure due to the attestation being rejected, e.arc and e.rejectionReasons may be used
