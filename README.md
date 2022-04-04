@@ -6,7 +6,9 @@ This quickstart provides the basic steps for integrating Approov into your app. 
 
 To follow this guide you should have received an onboarding email for a trial or paid Approov account.
 
-## ADDING approov_service_flutter_httpclient
+Thie [Flutter](https://flutter.dev) package requires version 2.12.0 with Dart 2.17.0. At the time of writing (3rd April 2022) this is only accessible via the Flutter `beta` channel, not the `stable` channel. This is necessary because of the need to execute channel handlers on [background threads](https://docs.flutter.dev/development/platform-integration/platform-channels?tab=ios-channel-objective-c-tab#executing-channel-handlers-on-background-threads), which is only a recently added capability.
+
+## ADDING THE APPROOV CLIENT
 
 The Approov integration is available via [`Github`](https://github.com/approov/approov-service-flutter-httpclient) package. This allows inclusion into the project by simply specifying a dependency in the `pubspec.yaml` files for the app. In the `dependencies:` section of `pubspec.yaml` file add the following package reference:
 
@@ -17,12 +19,12 @@ approov_service_flutter_httpclient:
 
 This package is actually an open source wrapper layer that allows you to easily use Approov with `Flutter`. This has a further dependency to the closed source [Android Approov SDK](https://github.com/approov/approov-android-sdk) and [iOS Approov SDK](https://github.com/approov/approov-ios-sdk) packages. Those are automatically added as dependencies for the platform specific targets.
 
-The `approov_service_flutter_httpclient` package declares four classes:
+The `approov_service_flutter_httpclient` package provides a number of accessible classes:
 
-1. ApproovService and TokenFetchResult provide the SDK native binding
-2. ApproovHttpClient which is a drop-in replacement for the Dart IO library's HttpClient and calls the ApproovService
-3. ApproovClient which is a drop-in replacement for Client from the Flutter http package (https://pub.dev/packages/http)
-    and uses internally an ApproovHttpClient object
+1. `ApproovService` provides a higher level interface to the underlying Approov SDK
+2. `ApproovException`, and derived `ApproovNetworkException` and `ApproovRejectionException`, provide special exception classes for Approov related errors 
+3. `ApproovHttpClient` which is a drop-in replacement for the Dart IO library's `HttpClient` and calls the `ApproovService`
+4. `ApproovClient` which is a drop-in replacement for Client from the Flutter http package (https://pub.dev/packages/http) and internally uses an `ApproovHttpClient` object
 
 
 ### ANDROID
@@ -38,7 +40,7 @@ and two implementation dependencies:
 ```gradle
 dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.9.3'
-    implementation 'com.github.approov:approov-android-sdk:2.9.0'
+    implementation 'com.github.approov:approov-android-sdk:3.0.0'
 }
 ``` 
 
@@ -65,29 +67,15 @@ pod install
 
 in the directory containing the ios project files.
 
-### BUILD ISSUES
-
-If an error is reported during the application build complaining about a function parameter mismatch like this:
-
-```Bash
-approov_service_flutter_httpclient.dart:913:33: Error: The parameter 'f' of the method 'ApproovHttpClient.authenticate' has type 'Future<bool> Function(Uri, String, String?)?', which does not match the corresponding type, 'Future<bool> Function(Uri, String, String)?', in the overridden method, 'HttpClient.authenticate'.
- - 'Future' is from 'dart:async'.
- - 'Uri' is from 'dart:core'.
-```
-
-please ensure your version of flutter is at least `2.5.3` and if you have recently updated `flutter` please update the dart libraries by executing `dart pub cache clean` which should clean the cache before running `flutter pub get` and updating your application dependencies.
-
 ## INITIALIZING APPROOV SERVICE
 
 The `ApproovClient` declared in the `approov_service_flutter_httpclient` package can be used as a drop in replacement for [Client](https://pub.dev/packages/http) from the Flutter http package. It will handle any request in the same way but with the additional features provided by the `Approov SDK`. The only additional requirement when using `ApproovClient` is providing an initialization string during object creation:
 
 ```Dart
-// Import the package
 import 'package:approov_service_flutter_httpclient/approov_service_flutter_httpclient.dart';
 ...
 ...
-http.Client client = ApproovClient(
-          '<enter-your-config-string-here>');
+http.Client client = ApproovClient('<enter-your-config-string-here>');
 ```
 
 The `<enter-your-config-string-here>` is a custom string that configures your Approov account access. This will have been provided in your Approov onboarding email.
@@ -102,7 +90,7 @@ After initializing the `ApproovClient` you can perform requests and await respon
 http.Response response = await client.get(Uri.parse('https://approov.io'));
 ```
 
-This adds the `Approov-Token` header and pins the connections.
+This client includes an interceptor that protects channel integrity (with either pinning or managed trust roots). The interceptor may also add `Approov-Token` or substitute app secret values, depending upon your integration choices. You should thus use this client for all API calls you may wish to protect.
 
 ## CHECKING IT WORKS
 
@@ -110,9 +98,21 @@ Initially you won't have set which API domains to protect, so the interceptor wi
 
 Your Approov onboarding email should contain a link allowing you to access [Live Metrics Graphs](https://approov.io/docs/latest/approov-usage-documentation/#metrics-graphs). After you've run your app with Approov integration you should be able to see the results in the live metrics within a minute or so. At this stage you could even release your app to get details of your app population and the attributes of the devices they are running upon.
 
-However, to actually protect your APIs there are some further steps you can learn about in [Next Steps](https://github.com/approov/quickstart-flutter-httpclient/blob/master/NEXT-STEPS.md).
+## NEXT STEPS
+To actually protect your APIs there are some further steps. Approov provides two different options for protecting APIs:
 
+* [TOKEN PROTECTION](https://github.com/approov/quickstart-flutter-httpclient/blob/master/TOKEN-PROTECTION.md): You should use this if you control the backend API(s) being protected and are able to modify them to ensure that a valid Approov token is being passed by the app. An [Approov Token](https://approov.io/docs/latest/approov-usage-documentation/#approov-tokens) is short lived crytographically signed JWT proving the authenticity of the call.
 
+* [SECRET PROTECTION](https://github.com/approov/quickstart-flutter-httpclient/blob/master/SECRET-PROTECTION.md): If you do not control the backend API(s) being protected, and are therefore unable to modify it to check Approov tokens, you can use this approach instead. It allows app secrets, and API keys, to be protected so that they no longer need to be included in the built code and are only made available to passing apps at runtime.
 
+Note that it is possible to use both approaches side-by-side in the same app, in case your app uses a mixture of 1st and 3rd party APIs.
 
+## USE WITH DIO
+It is also possible to use Approov with the [`dio`](https://pub.dev/packages/dio) networking stack, since this uses `http.Client` internally. When constructing a `dio` object you need to modify the underlying client used as follows:
 
+```Dart
+    var dio = Dio();
+    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client) {
+      return ApproovHttpClient('<enter-your-config-string-here>');
+    };
+```

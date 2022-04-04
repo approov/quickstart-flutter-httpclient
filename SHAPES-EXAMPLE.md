@@ -5,12 +5,11 @@ This quickstart is written specifically for native Android and iOS apps that are
 ## WHAT YOU WILL NEED
 * Access to a trial or paid Approov account
 * The `approov` command line tool [installed](https://approov.io/docs/latest/approov-installation/) with access to your account
-* [Android Studio](https://developer.android.com/studio) installed (version ArticFox 2020.3.1 is used in this guide) if you will build the Android app
-* [Xcode](https://developer.apple.com/xcode/) installed (version 13.0 is used in this guide) to build iOS version of application
-* [Cocoapods](https://cocoapods.org) installed to support iOS building (1.11.2 used in this guide)
-* [Flutter](https://flutter.dev) version 2.5.3 used in this guide with Dart 2.14.4
+* [Android Studio](https://developer.android.com/studio) installed (version Bumblebee 2021.1 is used in this guide) if you will build the Android app
+* [Xcode](https://developer.apple.com/xcode/) installed (version 13.3 is used in this guide) to build iOS version of application
+* [Cocoapods](https://cocoapods.org) installed to support iOS building (1.11.3 used in this guide)
+* [Flutter](https://flutter.dev) version 2.12.0 used in this guide with Dart 2.17.0
 * The contents of this repo
-
 
 
 ## RUNNING THE SHAPES APP WITHOUT APPROOV
@@ -71,7 +70,7 @@ If the Android build fails with `Manifest merger failed : Attribute application@
 
 If the iOS build fails with an error related to `Pods-Runner` then navigate inside `ios` folder using `cd ios` and run `pod install`.
 
-If the iOS build fails with an error complaining about missing `.xcconfig` files, like for example `error: could not find included file Pods/Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig in search paths` you need to open the xcode workspace file `example/ios/ios/Runner.xcworkspace` and await for Xcode to reindex all the files. Then close the workspace and run the tes app again.
+If the iOS build fails with an error complaining about missing `.xcconfig` files, like for example `error: could not find included file Pods/Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig in search paths` you need to open the xcode workspace file `example/ios/ios/Runner.xcworkspace` and await for Xcode to reindex all the files. Then close the workspace and run the test app again.
 
 If the iOS build fails with a signing error, open the Xcode project located in `quickstart-flutter-httpclient/example/ios/Runner.xcworkspace`:
 
@@ -85,37 +84,34 @@ Also ensure you modify the app's `Bundle Identifier` so it contains a unique str
 
 ## ADDING APPROOV SUPPORT
 
-Approov protection is provided through the `approov_service_flutter_httpclient` plugin for both, Android and iOS mobile platforms. This plugin handles all Approov related functionality, such as downloading and instalation of Approov SDK library, initialization, managing of initial and update configurations, fetching of Approov tokens, adding these to API requests as necessary, and manages certificate public key pinning. The plugin also requests all necessary network permissions.
+Approov protection is provided through the `approov_service_flutter_httpclient` plugin for both, Android and iOS mobile platforms. This plugin handles all Approov related functionality, such as downloading and installation of Approov SDK library, initialization, managing of initial and update configurations, fetching of Approov tokens, adding these to API requests as necessary, and manages certificate public key pinning. The plugin also requests all necessary network permissions.
 
 In the configuration file `quickstart-flutter-httpclient/example/pubspec.yaml` find the location marked with
 ```
 # *** UNCOMMENT THE SECTION BELOW FOR APPROOV ***
 ```
-and change them as shown
+and change them as shown:
 
-1. Add the dependency for the approov_service_flutter_httpclient package
+1. Add the dependency for the `approov_service_flutter_httpclient` package
 ```
   # *** UNCOMMENT THE SECTION BELOW FOR APPROOV ***
   approov_service_flutter_httpclient:
      git: https://github.com/approov/approov_service_flutter_httpclient.git
 ```
 
-In the source file `quickstart-flutter-httpclient/example/lib/main.dart` find the two locations marked with a comment
-```
-// *** UNCOMMENT THE SECTION BELOW FOR APPROOV ***
-```
-and change them to read
+In the source file `quickstart-flutter-httpclient/example/lib/main.dart` find the two locations marked with a comment and change them:
 
-1. Import the approov_http_client package
-```
+1. Import the `approov_http_client package`
+```Dart
 // *** UNCOMMENT THE LINE BELOW FOR APPROOV ***
 import 'package:approov_service_flutter_httpclient/approov_service_flutter_httpclient.dart';
 ```
 
-2. Create a Client.
-```
+2. Create a Client
+```Dart
+// *** COMMENT THE LINE BELOW FOR APPROOV ***
 // http.Client client = http.Client();
-// *** UNCOMMENT THE LINE BELOW FOR APPROOV (and comment out the line above) ***
+// *** UNCOMMENT THE LINE BELOW FOR APPROOV ***
 client = ApproovClient('<enter-your-config-string-here>');
 ```
 
@@ -123,27 +119,28 @@ The `<enter-your-config-string-here>` is a custom string that configures your Ap
 
 ### Select the Correct Shapes Endpoint
 
-The Shapes server provides the app with shapes using multiple versions of an API. Version 2 (https://shapes.approov.io/v2/shapes) requires a valid Approov token to be passed in the request.
+The Shapes server provides the app with shapes using multiple versions of an API. Initially version 1 is used that only checks the API key configured in the app. Version 3 (https://shapes.approov.io/v3/shapes) requires a valid Approov token to be passed in the request as well as the correct API key.
 
-Now that we’re using Approov, let’s switch to use version 2 of the Shapes API. Edit the Dart source in `quickstart-flutter-httpclient/example/lib/main.dart` find the line of code:
+Now that we’re using Approov, let’s switch to use version 3 of the Shapes API. Edit the Dart source in `quickstart-flutter-httpclient/example/lib/main.dart` find the line of code:
 
+```Dart
+const String API_VERSION = 'v1';
 ```
-const String API_VERSION = 'v1'; // API v1 is unprotected; API v2 is protected by Approov
-```
-and change the Shapes server URLs to the v2 API path:
-```
-const String API_VERSION = 'v2'; // API v1 is unprotected; API v2 is protected by Approov
+and change the version:
+
+```Dart
+const String API_VERSION = 'v3';
 ```
 
 ### Ensure the Shapes API is Added
 
-In order for Approov tokens to be generated for `https://shapes.approov.io/v2/shapes` it is necessary to inform Approov about it. If you are using a demo account this is unnecessary as it is already set up. For a trial account do:
+In order for Approov tokens to be generated for `https://shapes.approov.io/v3/shapes` it is necessary to inform Approov about it:
 
 ```
 $ approov api -add shapes.approov.io
 ```
 
-Tokens for this domain will be automatically signed with the specific secret for this domain, rather than the normal one for your account. After a short delay of no more than 30 seconds the new API settings become active.
+Tokens for this domain will be automatically signed with the specific secret for this domain, rather than the normal one for your account. After a short delay of about 30 seconds the new API settings become active.
 
 
 ### Build and Run the App Again
@@ -152,20 +149,19 @@ Build the app on your preferred platform (Approov requires building for a device
 
 For iOS: Note that it may be necessary to run the command `pod update` in the `quickstart-flutter-httpclient/example/ios` directory first as the Flutter Shapes app is built using the CocoaPods dependency framework.
 
-Install and run the app on a device or an emulator and examine the logging. You should see in the logs that Approov is successfully fetching tokens, but the Shapes API is not returning valid shapes:
+Install and run the app on a device and examine the logging. You should see in the logs that Approov is successfully fetching tokens, but the Shapes API is not returning valid shapes:
 
 <p>
     <img src="readme-images/flutter-shape-invalid.jpg" width="256" title="Invalid">
 </p>
 
-**Warning:** Never log tokens in a released app as this could permit hackers to harvest data from your API while the token has not expired! Always use _[loggable](https://www.approov.io/docs/latest/approov-usage-documentation/#loggable-tokens)_ Approov tokens for debugging.
-
-
 ## REGISTER YOUR APP WITH APPROOV
 
 Although the application is now receiving and forwarding tokens with your API calls, the tokens are not yet properly signed, because the attestation service does not recognize your application. Once you register the app with the Approov service, untampered apps will attest successfully and begin to fetch and transmit valid tokens.
 
-Approov command line tools are provided for Windows, MacOS, and Linux platforms. Select the proper operating system executable. In a shell in your `quickstart-flutter-httpclient/example` directory:
+Approov command line tools are provided for Windows, MacOS, and Linux platforms. Select the proper operating system executable.
+
+In a shell in your `quickstart-flutter-httpclient/example` directory you need to register the app with Approov.
 
 For Android:
 
@@ -173,18 +169,17 @@ For Android:
 $ approov registration -add build/app/outputs/flutter-apk/app-debug.apk
 ```
 
-For iOS: It is necessary to build an app archive (.ipa extension) and export it to a convenient location, for example the `quickstart-flutter-httpclient` directory. Install the app's .ipa on the device in order to ensure that the installed version and the registered version are the same. Assuming you have built an app archive, signed it and exported it to `quickstart-flutter-httpclient/Runner\ 2021-02-04\ 14-27-30/ApproovHttpClient_example.ipa`, the registration command is:
+For iOS it is necessary to explicitly build an `.ipa` using the command `flutter build ipa`. This will provide the path of the `.ipa` that you can then register, e.g:
 
 ```
-$ approov registration -add ../../Runner\ 2021-02-04\ 14-27-30/ApproovHttpClient_example.ipa
+$ approov registration -add build/ios/ipa/ApproovHttpClient_example.ipa
 ```
 
+> **IMPORTANT:** The registration takes about 30 seconds to propagate across the Approov Cloud Infrastructure, therefore don't try to run the app again before this time has elapsed.
 
 ## RUN THE SHAPES APP WITH APPROOV
 
-Wait for the registration to propagate to the Approov service. This can take up to 30 seconds.
-
-Then restart the application on your device to flush out any bad tokens, tap _Shape_ and you should see one of four possible shapes:
+Restart the application on your device to flush out any bad tokens, tap _Shape_ and you should see one of four possible shapes:
 
 <a>
     <img src="readme-images/flutter-shape-triangle.png" width="256" title="Triangle">
@@ -209,18 +204,65 @@ Congratulations, your API is now Approoved!
 If you still don't get a valid shape then there are some things you can try. Remember this may be because the device you are using has some characteristics that cause rejection for the currently set [Security Policy](https://approov.io/docs/latest/approov-usage-documentation/#security-policies) on your Approov account:
 
 * Ensure that the version of the app you are running is exactly the one you registered with Approov.
-* Look at the [`logcat`](https://developer.android.com/studio/command-line/logcat) or the MacOS `Console` application output from the device. Information about any Approov token fetched or an error is output at the `INFO` level, e.g. `2020-02-10 13:55:55.774 10442-10705/io.approov.shapes I/ApproovInterceptor: Approov Token for shapes.approov.io: {"did":"+uPpGUPeq8bOaPuh+apuGg==","exp":1581342999,"ip":"1.2.3.4","sip":"R-H_vE"}`. You can easily [check](https://approov.io/docs/latest/approov-usage-documentation/#loggable-tokens) the validity and find out any reason for a failure.
+* Look at the Flutter logging for the device. Information about any Approov token fetched or an error is output at the debug level and is prefixed `ApproovService: updateRequest`. You can easily check the validity of the [loggable token](https://approov.io/docs/latest/approov-usage-documentation/#loggable-tokens) provided find out any reason for a failure.
 * Consider using an [Annotation Policy](https://approov.io/docs/latest/approov-usage-documentation/#annotation-policies) during initial development to directly see why the device is not being issued with a valid token.
 * Use `approov metrics` to see [Live Metrics](https://approov.io/docs/latest/approov-usage-documentation/#live-metrics) of the cause of failure.
 * You can use a debugger or emulator and get valid Approov tokens on a specific device by ensuring it [always passes](https://approov.io/docs/latest/approov-usage-documentation/#adding-a-device-security-policy). As a shortcut, when you are first setting up, you can add a [device security policy](https://approov.io/docs/latest/approov-usage-documentation/#adding-a-device-security-policy) using the `latest` shortcut as discussed so that the `device ID` doesn't need to be extracted from the logs or an Approov token.
-* Approov token data is logged to the console using a secure mechanism - that is, a _loggable_ version of the token is logged, rather than the _actual_ token for debug purposes. This is covered [here](https://www.approov.io/docs/latest/approov-usage-documentation/#loggable-tokens). The code which performs this is:
-
-```Dart
-const result = await ApproovService.fetchApproovToken(url);
-console.log("Fetched Approov token: " + result.loggableToken);
-```
-
-and the logged token is specified in the variable `result.loggableToken`.
+* Approov token data is logged to the console using a secure mechanism - that is, a _loggable_ version of the token is logged, rather than the _actual_ token for debug purposes. This is covered [here](https://www.approov.io/docs/latest/approov-usage-documentation/#loggable-tokens).
 
 The Approov token format (discussed [here](https://www.approov.io/docs/latest/approov-usage-documentation/#token-format)) includes an `anno` claim which can tell you why a particular Approov token is invalid and your app is not correctly authenticated with the Approov Cloud Service. The various forms of annotations are described [here](https://www.approov.io/docs/latest/approov-usage-documentation/#annotation-results).
 
+## SHAPES APP WITH SECRET PROTECTION
+
+This section provides an illustration of an alternative option for Approov protection if you are not able to modify the backend to add an Approov Token check. Firstly, revert any previous change to use the version 1 Shapes endpoint that simply checks for an API key:
+
+```Dart
+const String API_VERSION = 'v1';
+```
+
+The `API_KEY` should also be changed to the following, removing the actual API key out of the code:
+
+```Dart
+const API_KEY = "shapes_api_key_placeholder";
+```
+
+Next we enable the [Secure Strings](https://approov.io/docs/latest/approov-usage-documentation/#secure-strings) feature:
+
+```
+approov secstrings -setEnabled
+```
+
+> Note that this command requires an [admin role](https://approov.io/docs/latest/approov-usage-documentation/#account-access-roles).
+
+You must inform Approov that it should map `shapes_api_key_placeholder` to `yXClypapWNHIifHUWmBIyPFAm` (the actual API key) in requests as follows:
+
+```
+approov secstrings -addKey shapes_api_key_placeholder -predefinedValue yXClypapWNHIifHUWmBIyPFAm
+```
+
+> Note that this command also requires an [admin role](https://approov.io/docs/latest/approov-usage-documentation/#account-access-roles).
+
+Next we need to inform Approov that it needs to substitute the placeholder value for the real API key on the `api-key` header. Only a single line of code needs to be changed as follows:
+
+```Dart
+// *** UNCOMMENT THE LINE BELOW FOR APPROOV USING SECRET PROTECTION ***
+ApproovService.addSubstitutionHeader("api-key", null);
+```
+
+In a shell in your `quickstart-flutter-httpclient/example` directory you need to register the app with Approov.
+
+For Android:
+
+```
+$ approov registration -add build/app/outputs/flutter-apk/app-debug.apk
+```
+
+For iOS it is necessary to explicitly build an `.ipa` using the command `flutter build ipa`. This will provide the path of the `.ipa` that you can then register, e.g:
+
+```
+$ approov registration -add build/ios/ipa/ApproovHttpClient_example.ipa
+```
+
+> **IMPORTANT:** The registration takes about 30 seconds to propagate across the Approov Cloud Infrastructure, therefore don't try to run the app again before this time has elapsed.
+
+Run the app again without making any changes to the app and press the `Get Shape` button. You should now see a valid shape. This means that the registered app is able to access the API key, even though it is no longer embedded in the app configuration, and provide it to the shapes request.
