@@ -14,7 +14,9 @@ The Approov integration is available via [`Github`](https://github.com/approov/a
 
 ```yaml
 approov_service_flutter_httpclient:
-     git: https://github.com/approov/approov-service-flutter-httpclient.git
+    git:
+      url: https://github.com/approov/approov-service-flutter-httpclient.git
+      ref: 3.0.0
 ```
 
 This package is actually an open source wrapper layer that allows you to easily use Approov with `Flutter`. This has a further dependency to the closed source [Android Approov SDK](https://github.com/approov/approov-android-sdk) and [iOS Approov SDK](https://github.com/approov/approov-ios-sdk) packages. Those are automatically added as dependencies for the platform specific targets.
@@ -25,24 +27,6 @@ The `approov_service_flutter_httpclient` package provides a number of accessible
 2. `ApproovException`, and derived `ApproovNetworkException` and `ApproovRejectionException`, provide special exception classes for Approov related errors 
 3. `ApproovHttpClient` which is a drop-in replacement for the Dart IO library's `HttpClient` and calls the `ApproovService`
 4. `ApproovClient` which is a drop-in replacement for Client from the Flutter http package (https://pub.dev/packages/http) and internally uses an `ApproovHttpClient` object
-
-
-### ANDROID
-
-The `approov_service_flutter_httpclient` indirectly adds an additional repository to the project files:
-
-```gradle
-maven { url 'https://jitpack.io' }
-```
-
-and two implementation dependencies:
-
-```gradle
-dependencies {
-    implementation 'com.squareup.okhttp3:okhttp:4.9.3'
-    implementation 'com.github.approov:approov-android-sdk:3.0.0'
-}
-``` 
 
 ### ANDROID MANIFEST CHANGES
 
@@ -59,13 +43,13 @@ Please [read this](https://approov.io/docs/latest/approov-usage-documentation/#t
 
 ### IOS
 
-The `approov_service_flutter_httpclient` generates a [Cocoapods](https://cocoapods.org) dependency file which must be installed by executing:
+The `approov_service_flutter_httpclient` generates a [Cocoapods](https://cocoapods.org) dependency file which can be installed by executing:
 
 ```Bash
 pod install
 ```
 
-in the directory containing the ios project files.
+in the directory containing the iOS project files.
 
 ## INITIALIZING APPROOV SERVICE
 

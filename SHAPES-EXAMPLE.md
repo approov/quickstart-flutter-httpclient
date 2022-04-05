@@ -103,7 +103,9 @@ and change them as shown:
 ```
   # *** UNCOMMENT THE SECTION BELOW FOR APPROOV ***
   approov_service_flutter_httpclient:
-     git: https://github.com/approov/approov_service_flutter_httpclient.git
+    git:
+      url: https://github.com/approov/approov-service-flutter-httpclient.git
+      ref: 3.0.0
 ```
 
 In the source file `quickstart-flutter-httpclient/example/lib/main.dart` find the two locations marked with a comment and change them:
