@@ -18,11 +18,19 @@ The Shapes App is a simple Flutter application which demonstrates using the [Cli
 
 Before building the Flutter Shapes app, make sure that your system is set up for Flutter development by following the instructions at [Flutter Get Started](https://flutter.dev/docs/get-started/install).
 
+The application consists mostly of boilerplate code, apart from the definitions of the shapes server’s URLs and the onPressed callbacks (`hello()` and `shape()`) for the buttons along the bottom of the screen.
+
+To run the app on an attached device, open a shell terminal at the `quickstart-flutter-httpclient/example` directory and type:
+
+```
+$ flutter run
+```
+
+You should now be able to use the app to say hello and get shapes.
+
 <p>
     <img src="readme-images/flutter-shapes-app-start.png" width="256" title="Shapes App">
 </p>
-
-The application consists mostly of boilerplate code, apart from the definitions of the shapes server’s URLs and the onPressed callbacks (`hello()` and `shape()`) for the buttons along the bottom of the screen.
 
 The _Hello_ and _Shape_ buttons initiate API requests to the shapes server, using the the Flutter http package's Client. For example, the _Hello_ button initiates a `GET` request to the `shapes.approov.io/v1/hello` endpoint.
 
@@ -36,15 +44,15 @@ On a successful _hello_ request to `/v1/hello`, the client app will say hello wi
     <img src="readme-images/flutter-shapes-app-fail.png" width="256" title="Shapes App Fail">
 </a>
 
-### Running the App
+Tap _Shape_ and you should see this (or a different shape):
 
-To run the app on an attached device, open a shell terminal at the `quickstart-flutter-httpclient/example` directory and type:
+<a>
+    <img src="readme-images/flutter-shape-triangle.png" width="256" title="Triangle">
+</a>
 
-```
-$ flutter run
-```
+This contacts `https://shapes.approov.io/v1/shapes` to get the name of a random shape. This endpoint is protected with an API key that is built into the code, and therefore can be easily extracted from the app.
 
-You should now be able to use the app to say hello and get shapes.
+The subsequent steps of this guide show you how to provide better protection, either using an Approov Token or by migrating the API key to become an Approov managed secret.
 
 See the following sections if you have a problem with building or running.
 
@@ -67,7 +75,6 @@ If the Android build fails with `Manifest merger failed : Attribute application@
 ```
 
 ### iOS Potential Issues
-
 If the iOS build fails with an error related to `Pods-Runner` then navigate inside `ios` folder using `cd ios` and run `pod install`.
 
 If the iOS build fails with an error complaining about missing `.xcconfig` files, like for example `error: could not find included file Pods/Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig in search paths` you need to open the xcode workspace file `example/ios/ios/Runner.xcworkspace` and await for Xcode to reindex all the files. Then close the workspace and run the test app again.
@@ -179,25 +186,15 @@ $ approov registration -add build/ios/ipa/ApproovHttpClient_example.ipa
 
 ## RUN THE SHAPES APP WITH APPROOV
 
-Restart the application on your device to flush out any bad tokens, tap _Shape_ and you should see one of four possible shapes:
-
-<a>
-    <img src="readme-images/flutter-shape-triangle.png" width="256" title="Triangle">
-</a>
+Restart the application on your device to ensure a new Approov token is fetched, tap _Shape_ and you should see this (or a different shape)::
 
 <a>
     <img src="readme-images/flutter-shape-circle.png" width="256" title="Circle">
 </a>
 
-<a>
-    <img src="readme-images/flutter-shape-square.png" width="256" title="Square">
-</a>
-
-<a>
-    <img src="readme-images/flutter-shape-rectangle.png" width="256" title="Rectangle">
-</a>
-
 Congratulations, your API is now Approoved!
+
+> **NOTE:** Running the app on an emulator or simulator will not provide valid Approov tokens. You will need to ensure it always passes on your the device (see below).
 
 ## WHAT IF I DON'T GET SHAPES
 
@@ -207,7 +204,7 @@ If you still don't get a valid shape then there are some things you can try. Rem
 * Look at the Flutter logging for the device. Information about any Approov token fetched or an error is output at the debug level and is prefixed `ApproovService: updateRequest`. You can easily check the validity of the [loggable token](https://approov.io/docs/latest/approov-usage-documentation/#loggable-tokens) provided find out any reason for a failure.
 * Consider using an [Annotation Policy](https://approov.io/docs/latest/approov-usage-documentation/#annotation-policies) during initial development to directly see why the device is not being issued with a valid token.
 * Use `approov metrics` to see [Live Metrics](https://approov.io/docs/latest/approov-usage-documentation/#live-metrics) of the cause of failure.
-* You can use a debugger or emulator and get valid Approov tokens on a specific device by ensuring it [always passes](https://approov.io/docs/latest/approov-usage-documentation/#adding-a-device-security-policy). As a shortcut, when you are first setting up, you can add a [device security policy](https://approov.io/docs/latest/approov-usage-documentation/#adding-a-device-security-policy) using the `latest` shortcut as discussed so that the `device ID` doesn't need to be extracted from the logs or an Approov token.
+* You can use a debugger or emulator/simulator and get valid Approov tokens on a specific device by ensuring it [always passes](https://approov.io/docs/latest/approov-usage-documentation/#adding-a-device-security-policy). As a shortcut, when you are first setting up, you can add a [device security policy](https://approov.io/docs/latest/approov-usage-documentation/#adding-a-device-security-policy) using the `latest` shortcut as discussed so that the `device ID` doesn't need to be extracted from the logs or an Approov token.
 * Approov token data is logged to the console using a secure mechanism - that is, a _loggable_ version of the token is logged, rather than the _actual_ token for debug purposes. This is covered [here](https://www.approov.io/docs/latest/approov-usage-documentation/#loggable-tokens).
 
 The Approov token format (discussed [here](https://www.approov.io/docs/latest/approov-usage-documentation/#token-format)) includes an `anno` claim which can tell you why a particular Approov token is invalid and your app is not correctly authenticated with the Approov Cloud Service. The various forms of annotations are described [here](https://www.approov.io/docs/latest/approov-usage-documentation/#annotation-results).
