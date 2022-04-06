@@ -32,7 +32,7 @@ You should now be able to use the app to say hello and get shapes.
     <img src="readme-images/flutter-shapes-app-start.png" width="256" title="Shapes App">
 </p>
 
-The _Hello_ and _Shape_ buttons initiate API requests to the shapes server, using the the Flutter http package's Client. For example, the _Hello_ button initiates a `GET` request to the `shapes.approov.io/v1/hello` endpoint.
+The _Hello_ and _Shape_ buttons initiate API requests to the shapes server, using the Flutter http package's Client. For example, the _Hello_ button initiates a `GET` request to the `shapes.approov.io/v1/hello` endpoint.
 
 On a successful _hello_ request to `/v1/hello`, the client app will say hello with a smile, while a failure or unsuccessful response will return a frown with some explanation of the error. The purpose of this simple endpoint is really just to test connectivity and to verify that you have built, installed and run the demo app correctly.
 
