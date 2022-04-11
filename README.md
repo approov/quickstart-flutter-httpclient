@@ -1,6 +1,6 @@
 # Approov Quickstart: Flutter HTTP Client
 
-This quickstart is written specifically for Android and iOS apps that are implemented using [`Flutter`](https://flutter.dev/) and the [`Dart HTTPClient class from the dart:io library`](https://api.dart.dev/stable/2.9.3/dart-io/HttpClient-class.html) or the [`Flutter HTTP package`](https://pub.dev/packages/http). If this is not your situation then please check if there is a more relevant Quickstart guide available.
+This quickstart is written specifically for Android and iOS apps that are implemented using [`Flutter`](https://flutter.dev/) and the [`HTTP Client`](https://pub.dev/documentation/http/latest/http/Client-class.html), the [`Dart IO HttpClient`](https://api.dart.dev/stable/2.16.2/dart-io/HttpClient-class.html) or [`Dio`](https://pub.dev/packages/dio). If this is not your situation then please check if there is a more relevant quickstart guide available.
 
 This quickstart provides the basic steps for integrating Approov into your app. A more detailed step-by-step guide using a [Shapes App Example](https://github.com/approov/quickstart-flutter-httpclient/blob/master/SHAPES-EXAMPLE.md) is also available.
 
@@ -8,7 +8,7 @@ To follow this guide you should have received an onboarding email for a trial or
 
 Thie [Flutter](https://flutter.dev) package requires version 2.12.0 with Dart 2.17.0. At the time of writing (3rd April 2022) this is only accessible via the Flutter `beta` channel, not the `stable` channel. This is necessary because of the need to execute channel handlers on [background threads](https://docs.flutter.dev/development/platform-integration/platform-channels?tab=ios-channel-objective-c-tab#executing-channel-handlers-on-background-threads), which is only a recently added capability.
 
-## ADDING THE APPROOV CLIENT
+## ADDING THE APPROOV SERVICE DEPENDENCY
 
 The Approov integration is available via [`Github`](https://github.com/approov/approov-service-flutter-httpclient) package. This allows inclusion into the project by simply specifying a dependency in the `pubspec.yaml` files for the app. In the `dependencies:` section of `pubspec.yaml` file add the following package reference:
 
@@ -16,7 +16,7 @@ The Approov integration is available via [`Github`](https://github.com/approov/a
 approov_service_flutter_httpclient:
     git:
       url: https://github.com/approov/approov-service-flutter-httpclient.git
-      ref: 3.0.0
+      ref: 3.0.1
 ```
 
 This package is actually an open source wrapper layer that allows you to easily use Approov with `Flutter`. This has a further dependency to the closed source [Android Approov SDK](https://github.com/approov/approov-android-sdk) and [iOS Approov SDK](https://github.com/approov/approov-ios-sdk) packages. Those are automatically added as dependencies for the platform specific targets.
@@ -51,30 +51,68 @@ pod install
 
 in the directory containing the iOS project files.
 
-## INITIALIZING APPROOV SERVICE
+## USING APPROOV WITH HTTP CLIENT
 
-The `ApproovClient` declared in the `approov_service_flutter_httpclient` package can be used as a drop in replacement for [Client](https://pub.dev/packages/http) from the Flutter http package. It will handle any request in the same way but with the additional features provided by the `Approov SDK`. The only additional requirement when using `ApproovClient` is providing an initialization string during object creation:
+The `ApproovClient` declared in the `approov_service_flutter_httpclient` package can be used as a drop in replacement for [`HTTP Client`](https://pub.dev/documentation/http/latest/http/Client-class.html) from the Flutter http package. It will handle any request in the same way but with the additional features provided by the `Approov SDK`. The only additional requirement when using `ApproovClient` is providing an initialization string during object creation:
 
 ```Dart
 import 'package:approov_service_flutter_httpclient/approov_service_flutter_httpclient.dart';
 ...
-...
 http.Client client = ApproovClient('<enter-your-config-string-here>');
 ```
 
-The `<enter-your-config-string-here>` is a custom string that configures your Approov account access. This will have been provided in your Approov onboarding email.
+The `<enter-your-config-string-here>` is a custom string that configures your Approov account access. This will have been provided in your Approov onboarding email. This initializes Approov when the app is first created. Please note that you must provide the initialization String every time you instantiate an `ApproovClient` but the underlying SDK only actually initializes the library once.
 
-This initializes Approov when the app is first created. Please note that you must provide the initialization String every time you instantiate an `ApproovClient` but the underlying SDK only actually initializes the library once.
-
-## USING APPROOV SERVICE
-
-After initializing the `ApproovClient` you can perform requests and await responses like so:
+After creatng the `ApproovClient` you can perform requests and await responses as normal, for example:
 
 ```Dart
-http.Response response = await client.get(Uri.parse('https://approov.io'));
+http.Response response = await client.get(Uri.parse('https://your.domain/api'));
 ```
 
-This client includes an interceptor that protects channel integrity (with either pinning or managed trust roots). The interceptor may also add `Approov-Token` or substitute app secret values, depending upon your integration choices. You should thus use this client for all API calls you may wish to protect.
+This client includes an interceptor that protects channel integrity (with either pinning or managed trust roots) and may also add `Approov-Token` or substitute app secret values, depending upon your integration choices. You should thus use this client for all API calls you may wish to protect.
+
+## USING APPROOV WITH DART IO HTTPCLIENT
+
+The `ApproovHttpClient` declared in the `approov_service_flutter_httpclient` package can be used as a drop in replacement for the [`Dart IO HttpClient`](https://api.dart.dev/stable/2.16.2/dart-io/HttpClient-class.html). It will handle any request in the same way but with the additional features provided by the `Approov SDK`. The only additional requirement when using `ApproovHttpClient` is providing an initialization string during object creation:
+
+```Dart
+import 'package:approov_service_flutter_httpclient/approov_service_flutter_httpclient.dart';
+...
+HttpClient client = ApproovHttpClient('<enter-your-config-string-here>');
+```
+
+The `<enter-your-config-string-here>` is a custom string that configures your Approov account access. This will have been provided in your Approov onboarding email. This initializes Approov when the app is first created. Please note that you must provide the initialization String every time you instantiate an `ApproovHttpClient` but the underlying SDK only actually initializes the library once.
+
+After creatng the `ApproovHttpClient` you can perform requests and await responses as normal, for example:
+
+```Dart
+HttpClientRequest request = await client.getUrl(Uri.parse('https://your.domain/api'));
+HttpClientResponse response = await request.close();
+```
+
+This client protects channel integrity (with either pinning or managed trust roots) and may also add `Approov-Token` or substitute app secret values, depending upon your integration choices. You should thus use this client for all API calls you may wish to protect.
+
+## USING APPROOV WITH DIO
+It is also possible to use Approov with the [`Dio`](https://pub.dev/packages/dio) networking stack, since this uses `HttpClient` internally. When constructing a `Dio` object you need to modify the underlying client used as follows:
+
+```Dart
+import 'package:dio/adapter.dart';
+...
+var dio = Dio();
+(dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client) {
+  return ApproovHttpClient('<enter-your-config-string-here>');
+};
+```
+
+The `<enter-your-config-string-here>` is a custom string that configures your Approov account access. This will have been provided in your Approov onboarding email. This initializes Approov when the app is first created. Please note that you must provide the initialization String every time you instantiate an `ApproovHttpClient` but the underlying SDK only actually initializes the library once.
+
+After creatng the `Dio` you can perform requests and await responses as normal, for example:
+
+```Dart
+var response = await dio.get('https://your.domain/api');
+```
+
+This client protects channel integrity (with either pinning or managed trust roots) and may also add `Approov-Token` or substitute app secret values, depending upon your integration choices. You should thus use this client for all API calls you may wish to protect.
 
 ## CHECKING IT WORKS
 
@@ -90,13 +128,3 @@ To actually protect your APIs there are some further steps. Approov provides two
 * [SECRET PROTECTION](https://github.com/approov/quickstart-flutter-httpclient/blob/master/SECRET-PROTECTION.md): If you do not control the backend API(s) being protected, and are therefore unable to modify it to check Approov tokens, you can use this approach instead. It allows app secrets, and API keys, to be protected so that they no longer need to be included in the built code and are only made available to passing apps at runtime.
 
 Note that it is possible to use both approaches side-by-side in the same app, in case your app uses a mixture of 1st and 3rd party APIs.
-
-## USE WITH DIO
-It is also possible to use Approov with the [`dio`](https://pub.dev/packages/dio) networking stack, since this uses `http.Client` internally. When constructing a `dio` object you need to modify the underlying client used as follows:
-
-```Dart
-    var dio = Dio();
-    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client) {
-      return ApproovHttpClient('<enter-your-config-string-here>');
-    };
-```
