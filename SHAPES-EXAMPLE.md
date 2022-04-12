@@ -105,18 +105,18 @@ and change them as shown:
   approov_service_flutter_httpclient:
     git:
       url: https://github.com/approov/approov-service-flutter-httpclient.git
-      ref: 3.0.1
+      ref: 3.0.2
 ```
 
 In the source file `quickstart-flutter-httpclient/example/lib/main.dart` find the two locations marked with a comment and change them:
 
-1. Import the `approov_http_client package`
+1. Import the Approov service:
 ```Dart
 // *** UNCOMMENT THE LINE BELOW FOR APPROOV ***
 import 'package:approov_service_flutter_httpclient/approov_service_flutter_httpclient.dart';
 ```
 
-2. Create a Client
+2. Create a Client:
 ```Dart
 // *** COMMENT THE LINE BELOW FOR APPROOV ***
 // http.Client client = http.Client();
@@ -167,8 +167,6 @@ Install and run the app on a device and examine the logging. You should see in t
 ## REGISTER YOUR APP WITH APPROOV
 
 Although the application is now receiving and forwarding tokens with your API calls, the tokens are not yet properly signed, because the attestation service does not recognize your application. Once you register the app with the Approov service, untampered apps will attest successfully and begin to fetch and transmit valid tokens.
-
-Approov command line tools are provided for Windows, MacOS, and Linux platforms. Select the proper operating system executable.
 
 In a shell in your `quickstart-flutter-httpclient/example` directory you need to register the app with Approov.
 

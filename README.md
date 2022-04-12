@@ -16,7 +16,7 @@ The Approov integration is available via [`Github`](https://github.com/approov/a
 approov_service_flutter_httpclient:
     git:
       url: https://github.com/approov/approov-service-flutter-httpclient.git
-      ref: 3.0.1
+      ref: 3.0.2
 ```
 
 This package is actually an open source wrapper layer that allows you to easily use Approov with `Flutter`. This has a further dependency to the closed source [Android Approov SDK](https://github.com/approov/approov-android-sdk) and [iOS Approov SDK](https://github.com/approov/approov-ios-sdk) packages. Those are automatically added as dependencies for the platform specific targets.
@@ -128,3 +128,11 @@ To actually protect your APIs there are some further steps. Approov provides two
 * [SECRET PROTECTION](https://github.com/approov/quickstart-flutter-httpclient/blob/master/SECRET-PROTECTION.md): If you do not control the backend API(s) being protected, and are therefore unable to modify it to check Approov tokens, you can use this approach instead. It allows app secrets, and API keys, to be protected so that they no longer need to be included in the built code and are only made available to passing apps at runtime.
 
 Note that it is possible to use both approaches side-by-side in the same app, in case your app uses a mixture of 1st and 3rd party APIs.
+
+## iOS BITCODE SUPPORT
+
+If you wish to build a bitcode version of the iOS app then you must follow the [Flutter instructions](https://github.com/flutter/flutter/wiki/Creating-an-iOS-Bitcode-enabled-app).
+
+The underlying Approov SDK relies on native code, and in order to support bitcode you must use a different version of this SDK. To do this you must change the `approov_service_flutter_httpclient.podspec` for iOS within the `approov_service_flutter_httpclient` package. You will need to make a local copy of the package to do this. Change the reference to `approov-ios-sdk` to `approov-ios-sdk-bitcode`. This will use the [bitcode enabled version](https://github.com/approov/approov-ios-sdk-bitcode) of the SDK.
+
+Note that you should also use the `-bitcode` option when registering your app to ensure Approov is aware that you are using a bitcode SDK, as this has some impact on its required configuration.
