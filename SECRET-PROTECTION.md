@@ -60,7 +60,7 @@ With this in place the Approov interceptor should replace the `<secret-placehold
 If the secret value is provided as a parameter in a URL query string then it is necessary to call a function that may rewrite the URL. This must be done before the request is made. For instance, if you wish to substitute the parameter `<secret-param>` then you must call:
 
 ```Dart
-uri = await YourApp.approovService.substituteQueryParam(uri, "<secret-param>");
+uri = await ApproovService.substituteQueryParam(uri, "<secret-param>");
 ```
 
 If no substitution is made then the return value is the same as the input [Uri](https://api.dart.dev/stable/2.0.0/dart-core/Uri-class.html), otherwise a new `Uri` is created with the substituted parameter value. The call should transform any instance of a URL such as `https://mydomain.com/endpoint?<secret-param>=<secret-placeholder>` into `https://mydomain.com/endpoint?<secret-param>=<secret-value>`, if the app passes attestation and there is a secure string with the name `<secret-placeholder>`. The function call may throw `ApproovException` which you must handle. Note that this should only ever be applied to a `Uri` with a host domain that has been added to Approov, so that either pinning or managed trust roots protection is being applied.
