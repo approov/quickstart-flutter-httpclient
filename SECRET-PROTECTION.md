@@ -79,8 +79,10 @@ $ approov registration -add build/app/outputs/flutter-apk/app-debug.apk
 For iOS it is necessary to explicitly build an `.ipa` using the command `flutter build ipa`. This will provide the path of the `.ipa` that you can then register, e.g:
 
 ```
-$ approov registration -add build/ios/ipa/ApproovHttpClient_example.ipa
+$ approov registration -add build/ios/ipa/YourApp.ipa
 ```
+
+Remember if you are using bitcode then you must also use the `-bitcode` option with the registration.
 
 > **IMPORTANT:** The registration takes up to 30 seconds to propagate across the Approov Cloud Infrastructure, therefore don't try to run the app again before this time has elapsed. During development of your app you can ensure the device [always passes](https://approov.io/docs/latest/approov-usage-documentation/#adding-a-device-security-policy) so you do not have to register the APK each time you modify it.
 
@@ -104,8 +106,6 @@ You will then be able to use the `rejectionReasons` member on an `ApproovRejecti
 ## FURTHER OPTIONS
 
 See [Getting Started With Approov](https://approov.io/docs/latest/approov-usage-documentation/#getting-started-with-approov) for information about additional Approov features you may wish to try.
-
-The quickstart also provides the following additional methods:
 
 ### Header Prefixes
 In some cases the value to be substituted on a header may be prefixed by some fixed string. A common case is the presence of `Bearer` included in an authorization header to indicate the use of a bearer token. In this case you can specify a prefix as follows:
