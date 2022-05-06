@@ -20,6 +20,8 @@ Future<void> initialize(String config) async
 
 This will throw an `ApproovException` if a second attempt is made at initialization with a different `config`.
 
+> *NOTE:** In general there is no need to call this function as the initialization is handled by the config string passed to `ApproovClient` or `ApproovHttpClient`.
+
 ## SetProceedOnNetworkFail
 If the provided `proceed` value is `true` then this indicates that the network interceptor should proceed anyway if it is not possible to obtain an Approov token due to a networking failure. If this is called then the backend API can receive calls without the expected Approov token header being added, or without header/query parameter substitutions being made. This should only ever be used if there is some particular reason, perhaps due to local network conditions, that you believe that traffic to the Approov cloud service will be particularly problematic.
 
