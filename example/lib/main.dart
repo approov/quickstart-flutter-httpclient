@@ -27,8 +27,8 @@ import 'package:logger/logger.dart';
 // *** UNCOMMENT THE LINE BELOW FOR APPROOV ***
 //import 'package:approov_service_flutter_httpclient/approov_service_flutter_httpclient.dart';
 
-// Shapes API v1 is protected by an API key only - this is used initially and for SECRET PROTECTION
-// v3 is protected by an API key and an Approov token - use this for TOKEN PROTECTION
+// Shapes API v1 is protected by an API key only - this is used initially and for SECRETS PROTECTION
+// v3 is protected by an API key and an Approov token - use this for API PROTECTION
 const String API_VERSION = 'v1';
 
 // Endpoint URLs to be used
@@ -36,7 +36,7 @@ const String HELLO_URL = "https://shapes.approov.io/$API_VERSION/hello";
 const String SHAPE_URL = "https://shapes.approov.io/$API_VERSION/shapes";
 
 // API key 'yXClypapWNHIifHUWmBIyPFAm' used to protect the shapes endpoint. Change this 'shapes_api_key_placeholder' when
-// using SECRET PROTECTION
+// using SECRETS PROTECTION
 const API_KEY = "yXClypapWNHIifHUWmBIyPFAm";
 
 void main() {
@@ -101,7 +101,7 @@ class _ShapesState extends State<Shapes> {
       // *** UNCOMMENT THE LINE BELOW FOR APPROOV ***
       //http.Client client = ApproovClient('<enter-your-config-string-here>');
 
-      // *** UNCOMMENT THE LINE BELOW FOR APPROOV USING SECRET PROTECTION ***
+      // *** UNCOMMENT THE LINE BELOW FOR APPROOV USING SECRETS PROTECTION ***
       //ApproovService.addSubstitutionHeader("api-key", null);
 
       http.Response response = await client.get(Uri.parse(SHAPE_URL), headers:{"api-key": API_KEY});

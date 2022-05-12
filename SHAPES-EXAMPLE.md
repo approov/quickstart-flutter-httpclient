@@ -184,7 +184,7 @@ $ approov registration -add build/ios/ipa/ApproovHttpClient_example.ipa
 
 > **IMPORTANT:** The registration takes about 30 seconds to propagate across the Approov Cloud Infrastructure, therefore don't try to run the app again before this time has elapsed.
 
-## RUN THE SHAPES APP WITH APPROOV
+## RUN THE SHAPES APP WITH API PROTECTION
 
 Restart the application on your device to ensure a new Approov token is fetched, tap _Shape_ and you should see this (or a different shape)::
 
@@ -209,7 +209,7 @@ If you still don't get a valid shape then there are some things you can try. Rem
 
 The Approov token format (discussed [here](https://www.approov.io/docs/latest/approov-usage-documentation/#token-format)) includes an `anno` claim which can tell you why a particular Approov token is invalid and your app is not correctly authenticated with the Approov Cloud Service. The various forms of annotations are described [here](https://www.approov.io/docs/latest/approov-usage-documentation/#annotation-results).
 
-## SHAPES APP WITH SECRET PROTECTION
+## SHAPES APP WITH SECRETS PROTECTION
 
 This section provides an illustration of an alternative option for Approov protection if you are not able to modify the backend to add an Approov Token check. Firstly, revert any previous change to use the version 1 Shapes endpoint that simply checks for an API key:
 
@@ -242,7 +242,7 @@ approov secstrings -addKey shapes_api_key_placeholder -predefinedValue yXClypapW
 Next we need to inform Approov that it needs to substitute the placeholder value for the real API key on the `api-key` header. Only a single line of code needs to be changed as follows:
 
 ```Dart
-// *** UNCOMMENT THE LINE BELOW FOR APPROOV USING SECRET PROTECTION ***
+// *** UNCOMMENT THE LINE BELOW FOR APPROOV USING SECRETS PROTECTION ***
 ApproovService.addSubstitutionHeader("api-key", null);
 ```
 
