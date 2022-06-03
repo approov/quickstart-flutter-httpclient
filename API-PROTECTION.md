@@ -7,7 +7,7 @@ These steps require access to the [Approov CLI](https://approov.io/docs/latest/a
 In order for Approov tokens to be added by the interceptor for particular API domains it is necessary to inform Approov about them. Execute the following command:
 
 ```
-approov api -add <your-domain>
+approov api -add your.domain
 ```
 Approov tokens will then be added automatically to any requests to that domain (using the `Approov-Token` header, by default).
 
@@ -65,7 +65,7 @@ ApproovService.prefetch()
 This initiates the process of fetching an Approov token as a background task, so that a cached token is available immediately when subsequently needed, or at least the fetch time is reduced. Note that there is no point in performing a prefetch if you are using token binding.
 
 ### Prechecking
-You may wish to do an early check in your to present a warning to the user if the app is not going to be able to obtain valid Approov tokens because it fails the attestation process. To do this you first need to enable the [Secure Strings](https://approov.io/docs/latest/approov-usage-documentation/#secure-strings) feature:
+You may wish to do an early check in your app to present a warning to the user if it is not going to be able to obtain valid Approov tokens because it fails the attestation process. To do this you first need to enable the [Secure Strings](https://approov.io/docs/latest/approov-usage-documentation/#secure-strings) feature:
 
 ```
 approov secstrings -setEnabled
