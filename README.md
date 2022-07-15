@@ -8,6 +8,8 @@ To follow this guide you should have received an onboarding email for a trial or
 
 This package requires Flutter 3 because of the need to execute channel handlers on [background threads](https://docs.flutter.dev/development/platform-integration/platform-channels?tab=ios-channel-objective-c-tab#executing-channel-handlers-on-background-threads), which is only available in the stable channel from Flutter 3.
 
+Note that the minimum OS requirement for iOS is 10 and for Android the minimum SDK version is 21 (Android 5.0). You cannot use Approov in apps that need to support OS versions older than this.
+
 ## ADDING THE APPROOV SERVICE DEPENDENCY
 
 The Approov integration is available via [`Github`](https://github.com/approov/approov-service-flutter-httpclient) package. This allows inclusion into the project by simply specifying a dependency in the `pubspec.yaml` files for the app. In the `dependencies:` section of `pubspec.yaml` file add the following package reference:
@@ -36,8 +38,6 @@ The following app permissions need to be available in the manifest to use Approo
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 <uses-permission android:name="android.permission.INTERNET" />
 ```
-
-Note that the minimum SDK version you can use with the Approov package is 21 (Android 5.0). 
 
 Please [read this](https://approov.io/docs/latest/approov-usage-documentation/#targeting-android-11-and-above) section of the reference documentation if targeting Android 11 (API level 30) or above.
 
