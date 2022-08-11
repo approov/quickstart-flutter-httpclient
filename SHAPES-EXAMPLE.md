@@ -23,7 +23,7 @@ The application consists mostly of boilerplate code, apart from the definitions 
 To run the app on an attached device, open a shell terminal at the `quickstart-flutter-httpclient/example` directory and type:
 
 ```
-$ flutter run
+flutter run
 ```
 
 You should now be able to use the app to say hello and get shapes.
@@ -82,7 +82,7 @@ If the iOS build fails with an error complaining about missing `.xcconfig` files
 If the iOS build fails with a signing error, open the Xcode project located in `quickstart-flutter-httpclient/example/ios/Runner.xcworkspace`:
 
 ```
-$ open ios/Runner.xcworkspace
+open ios/Runner.xcworkspace
 ```
 
 and select your code signing team in the _Signing & Capabilities_ section of the project.
@@ -146,7 +146,7 @@ const String API_VERSION = 'v3';
 In order for Approov tokens to be generated for `https://shapes.approov.io/v3/shapes` it is necessary to inform Approov about it:
 
 ```
-$ approov api -add shapes.approov.io
+approov api -add shapes.approov.io
 ```
 
 Tokens for this domain will be automatically signed with the specific secret for this domain, rather than the normal one for your account. After a short delay of about 30 seconds the new API settings become active.
@@ -173,13 +173,13 @@ In a shell in your `quickstart-flutter-httpclient/example` directory you need to
 For Android:
 
 ```
-$ approov registration -add build/app/outputs/flutter-apk/app-debug.apk
+approov registration -add build/app/outputs/flutter-apk/app-debug.apk
 ```
 
 For iOS it is necessary to explicitly build an `.ipa` using the command `flutter build ipa`. This will provide the path of the `.ipa` that you can then register, e.g:
 
 ```
-$ approov registration -add build/ios/ipa/ApproovHttpClient_example.ipa
+approov registration -add build/ios/ipa/ApproovHttpClient_example.ipa
 ```
 
 > **IMPORTANT:** The registration takes about 30 seconds to propagate across the Approov Cloud Infrastructure, therefore don't try to run the app again before this time has elapsed.
@@ -251,13 +251,13 @@ In a shell in your `quickstart-flutter-httpclient/example` directory you need to
 For Android:
 
 ```
-$ approov registration -add build/app/outputs/flutter-apk/app-debug.apk
+approov registration -add build/app/outputs/flutter-apk/app-debug.apk
 ```
 
 For iOS it is necessary to explicitly build an `.ipa` using the command `flutter build ipa`. This will provide the path of the `.ipa` that you can then register, e.g:
 
 ```
-$ approov registration -add build/ios/ipa/ApproovHttpClient_example.ipa
+approov registration -add build/ios/ipa/ApproovHttpClient_example.ipa
 ```
 
 > **IMPORTANT:** The registration takes about 30 seconds to propagate across the Approov Cloud Infrastructure, therefore don't try to run the app again before this time has elapsed.

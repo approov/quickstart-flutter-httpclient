@@ -75,13 +75,13 @@ In order for Approov to recognize the app as being valid it needs to be register
 For Android:
 
 ```
-$ approov registration -add build/app/outputs/flutter-apk/app-debug.apk
+approov registration -add build/app/outputs/flutter-apk/app-debug.apk
 ```
 
 For iOS it is necessary to explicitly build an `.ipa` using the command `flutter build ipa`. This will provide the path of the `.ipa` that you can then register, e.g:
 
 ```
-$ approov registration -add build/ios/ipa/YourApp.ipa
+approov registration -add build/ios/ipa/YourApp.ipa
 ```
 
 Remember if you are using bitcode then you must also use the `-bitcode` option with the registration.
