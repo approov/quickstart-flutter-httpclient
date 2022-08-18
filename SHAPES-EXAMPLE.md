@@ -105,7 +105,7 @@ and change them as shown:
   approov_service_flutter_httpclient:
     git:
       url: https://github.com/approov/approov-service-flutter-httpclient.git
-      ref: 3.0.5
+      ref: 3.0.6
 ```
 
 In the source file `quickstart-flutter-httpclient/example/lib/main.dart` find the two locations marked with a comment and change them:

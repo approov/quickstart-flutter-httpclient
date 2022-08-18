@@ -18,7 +18,7 @@ The Approov integration is available via [`Github`](https://github.com/approov/a
 approov_service_flutter_httpclient:
     git:
       url: https://github.com/approov/approov-service-flutter-httpclient.git
-      ref: 3.0.5
+      ref: 3.0.6
 ```
 
 This package is actually an open source wrapper layer that allows you to easily use Approov with `Flutter`. This has a further dependency to the closed source [Android Approov SDK](https://github.com/approov/approov-android-sdk) and [iOS Approov SDK](https://github.com/approov/approov-ios-sdk) packages. Those are automatically added as dependencies for the platform specific targets.
