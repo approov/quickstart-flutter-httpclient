@@ -5,10 +5,10 @@ This quickstart is written specifically for native Android and iOS apps that are
 ## WHAT YOU WILL NEED
 * Access to a trial or paid Approov account
 * The `approov` command line tool [installed](https://approov.io/docs/latest/approov-installation/) with access to your account
-* [Android Studio](https://developer.android.com/studio) installed (version Bumblebee 2021.1 is used in this guide) if you will build the Android app
-* [Xcode](https://developer.apple.com/xcode/) installed (version 13.3 is used in this guide) to build iOS version of application
+* [Android Studio](https://developer.android.com/studio) installed (version Dolphin 2021.3.1 is used in this guide) if you will build the Android app
+* [Xcode](https://developer.apple.com/xcode/) installed (version 14.1 is used in this guide) to build iOS version of application
 * [Cocoapods](https://cocoapods.org) installed to support iOS building (1.11.3 used in this guide)
-* [Flutter](https://flutter.dev) stable version 3.0.1 is used in this guide. Note that integration is not possible with stable versions earlier than Flutter 3.
+* [Flutter](https://flutter.dev) stable version 3.3.7 is used in this guide. Note that integration is not possible with stable versions earlier than Flutter 3.
 * The contents of this repo
 
 

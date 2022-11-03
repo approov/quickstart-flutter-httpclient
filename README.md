@@ -8,7 +8,7 @@ To follow this guide you should have received an onboarding email for a trial or
 
 This package requires Flutter 3 because of the need to execute channel handlers on [background threads](https://docs.flutter.dev/development/platform-integration/platform-channels?tab=ios-channel-objective-c-tab#executing-channel-handlers-on-background-threads), which is only available in the stable channel from Flutter 3.
 
-Note that the minimum OS requirement for iOS is 10 and for Android the minimum SDK version is 21 (Android 5.0). You cannot use Approov in apps that need to support OS versions older than this.
+Note that the minimum OS requirement for iOS is 10 (although the latest versions of Flutter itself constrain this to iOS 11) and for Android the minimum SDK version is 21 (Android 5.0). You cannot use Approov in apps that need to support OS versions older than this.
 
 ## ADDING THE APPROOV SERVICE DEPENDENCY
 
@@ -113,6 +113,8 @@ var response = await dio.get('https://your.domain/api');
 ```
 
 This client protects channel integrity (with either pinning or managed trust roots) and may also add `Approov-Token` or substitute app secret values, depending upon your integration choices. You should thus use this client for all API calls you may wish to protect.
+
+Note that if you are using [Sentry](https://docs.sentry.io/platforms/flutter/) then you must make any call to `addSentry` after updating `onHttpClientCreate` as Sentry modifies the Dio adapter to something other than `DefaulyHttpClientAdapter`.
 
 ## CHECKING IT WORKS
 
