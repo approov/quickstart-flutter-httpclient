@@ -35,7 +35,7 @@ const String API_VERSION = 'v1';
 const String HELLO_URL = "https://shapes.approov.io/$API_VERSION/hello";
 const String SHAPE_URL = "https://shapes.approov.io/$API_VERSION/shapes";
 
-// API key 'yXClypapWNHIifHUWmBIyPFAm' used to protect the shapes endpoint. Change this 'shapes_api_key_placeholder' when
+// API key 'yXClypapWNHIifHUWmBIyPFAm' used to protect the shapes endpoint. Change this to 'shapes_api_key_placeholder' when
 // using SECRETS PROTECTION
 const API_KEY = "yXClypapWNHIifHUWmBIyPFAm";
 
