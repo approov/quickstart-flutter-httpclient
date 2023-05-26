@@ -82,8 +82,9 @@ try {
     await ApproovService.precheck();
 }
 on ApproovRejectionException catch(e) {
-    // failure due to the attestation being rejected, e.arc and e.rejectionReasons may be used to present information to the user
-    // (note e.rejectionReasons is only available if the feature is enabled, otherwise it is always an empty string)
+    // failure due to the attestation being rejected, e.arc and e.rejectionReasons may be used
+    // to present information to the user (note e.rejectionReasons is only available if the
+    // feature is enabled, otherwise it is always an empty string)
 }
 on ApproovNetworkException catch(e) {
     // failure due to a potentially temporary networking issue, allow for a user initiated retry
