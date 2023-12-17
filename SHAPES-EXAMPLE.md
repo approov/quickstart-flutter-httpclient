@@ -151,10 +151,9 @@ approov api -add shapes.approov.io
 
 Tokens for this domain will be automatically signed with the specific secret for this domain, rather than the normal one for your account. After a short delay of about 30 seconds the new API settings become active.
 
-
 ### Build and Run the App Again
 
-Build the app on your preferred platform (Approov requires building for a device on iOS).
+Build the app on your preferred platform.
 
 For iOS: Note that it may be necessary to run the command `pod update` in the `quickstart-flutter-httpclient/example/ios` directory first as the Flutter Shapes app is built using the CocoaPods dependency framework.
 
@@ -164,25 +163,37 @@ Install and run the app on a device and examine the logging. You should see in t
     <img src="readme-images/flutter-shape-invalid.jpg" width="256" title="Invalid">
 </p>
 
-## REGISTER YOUR APP WITH APPROOV
+## ADD YOUR SIGNING CERTIFICATE TO APPROOV
 
-Although the application is now receiving and forwarding tokens with your API calls, the tokens are not yet properly signed, because the attestation service does not recognize your application. Once you register the app with the Approov service, untampered apps will attest successfully and begin to fetch and transmit valid tokens.
+You should add the signing certificate used to sign apps so that Approov can recognize your app as being official.
 
-In a shell in your `quickstart-flutter-httpclient/example` directory you need to register the app with Approov.
-
-For Android:
-
-```
-approov registration -add build/app/outputs/flutter-apk/app-debug.apk
-```
-
-For iOS it is necessary to explicitly build an `.ipa` using the command `flutter build ipa`. This will provide the path of the `.ipa` that you can then register, e.g:
+### Android
+Add the local certificate used to sign apps in Android Studio. The following assumes it is in PKCS12 format:
 
 ```
-approov registration -add build/ios/ipa/ApproovHttpClient_example.ipa
+approov appsigncert -add ~/.android/debug.keystore -storePassword android -autoReg
 ```
 
-> **IMPORTANT:** The registration takes about 30 seconds to propagate across the Approov Cloud Infrastructure, therefore don't try to run the app again before this time has elapsed.
+See [Android App Signing Certificates](https://approov.io/docs/latest/approov-usage-documentation/#android-app-signing-certificates) if your keystore format is not recognized or if you have any issues adding the certificate. 
+
+### iOS
+These are available in your Apple development account portal. Go to the initial screen showing program resources:
+
+![Apple Program Resources](readme-images/program-resources.png)
+
+Click on `Certificates` and you will be presented with the full list of development and distribution certificates for the account. Click on the certificate being used to sign applications from your particular Xcode installation and you will be presented with the following dialog:
+
+![Download Certificate](readme-images/download-cert.png)
+
+Now click on the `Download` button and a file with a `.cer` extension is downloaded, e.g. `development.cer`. Add it to Approov with:
+
+```
+approov appsigncert -add development.cer -autoReg
+```
+
+If it is not possible to download the correct certificate from the portal then it is also possible to [add app signing certificates from the app](https://approov.io/docs/latest/approov-usage-documentation/#adding-apple-app-signing-certificates-from-app).
+
+> **IMPORTANT:** Apps built to run on the iOS simulator are not code signed and thus auto-registration does not work for them. In this case you can consider [forcing a device ID to pass](https://approov.io/docs/latest/approov-usage-documentation/#forcing-a-device-id-to-pass) to get a valid attestation.
 
 ## RUN THE SHAPES APP WITH API PROTECTION
 
@@ -200,14 +211,11 @@ Congratulations, your API is now Approoved!
 
 If you still don't get a valid shape then there are some things you can try. Remember this may be because the device you are using has some characteristics that cause rejection for the currently set [Security Policy](https://approov.io/docs/latest/approov-usage-documentation/#security-policies) on your Approov account:
 
-* Ensure that the version of the app you are running is exactly the one you registered with Approov.
+* Ensure that the version of the app you are running is signed with the correct certificate.
 * Look at the Flutter logging for the device. Information about any Approov token fetched or an error is output at the debug level and is prefixed `ApproovService: updateRequest`. You can easily check the validity of the [loggable token](https://approov.io/docs/latest/approov-usage-documentation/#loggable-tokens) provided find out any reason for a failure.
-* Consider using an [Annotation Policy](https://approov.io/docs/latest/approov-usage-documentation/#annotation-policies) during initial development to directly see why the device is not being issued with a valid token.
 * Use `approov metrics` to see [Live Metrics](https://approov.io/docs/latest/approov-usage-documentation/#live-metrics) of the cause of failure.
-* You can use a debugger or emulator/simulator and get valid Approov tokens on a specific device by ensuring it [always passes](https://approov.io/docs/latest/approov-usage-documentation/#adding-a-device-security-policy). As a shortcut, when you are first setting up, you can add a [device security policy](https://approov.io/docs/latest/approov-usage-documentation/#adding-a-device-security-policy) using the `latest` shortcut as discussed so that the `device ID` doesn't need to be extracted from the logs or an Approov token.
+* You can use a debugger or emulator/simulator and get valid Approov tokens if you [mark the signing certificate as being for development](https://approov.io/docs/latest/approov-usage-documentation/#development-app-signing-certificates).
 * Approov token data is logged to the console using a secure mechanism - that is, a _loggable_ version of the token is logged, rather than the _actual_ token for debug purposes. This is covered [here](https://www.approov.io/docs/latest/approov-usage-documentation/#loggable-tokens).
-
-The Approov token format (discussed [here](https://www.approov.io/docs/latest/approov-usage-documentation/#token-format)) includes an `anno` claim which can tell you why a particular Approov token is invalid and your app is not correctly authenticated with the Approov Cloud Service. The various forms of annotations are described [here](https://www.approov.io/docs/latest/approov-usage-documentation/#annotation-results).
 
 ## SHAPES APP WITH SECRETS PROTECTION
 
@@ -222,15 +230,6 @@ The `API_KEY` should also be changed to the following, removing the actual API k
 ```Dart
 const API_KEY = "shapes_api_key_placeholder";
 ```
-
-Next we enable the [Secure Strings](https://approov.io/docs/latest/approov-usage-documentation/#secure-strings) feature:
-
-```
-approov secstrings -setEnabled
-```
-
-> Note that this command requires an [admin role](https://approov.io/docs/latest/approov-usage-documentation/#account-access-roles).
-
 You must inform Approov that it should map `shapes_api_key_placeholder` to `yXClypapWNHIifHUWmBIyPFAm` (the actual API key) in requests as follows:
 
 ```
@@ -246,20 +245,4 @@ Next we need to inform Approov that it needs to substitute the placeholder value
 ApproovService.addSubstitutionHeader("api-key", null);
 ```
 
-In a shell in your `quickstart-flutter-httpclient/example` directory you need to register the app with Approov.
-
-For Android:
-
-```
-approov registration -add build/app/outputs/flutter-apk/app-debug.apk
-```
-
-For iOS it is necessary to explicitly build an `.ipa` using the command `flutter build ipa`. This will provide the path of the `.ipa` that you can then register, e.g:
-
-```
-approov registration -add build/ios/ipa/ApproovHttpClient_example.ipa
-```
-
-> **IMPORTANT:** The registration takes about 30 seconds to propagate across the Approov Cloud Infrastructure, therefore don't try to run the app again before this time has elapsed.
-
-Run the app again without making any changes to the app and press the `Get Shape` button. You should now see a valid shape. This means that the registered app is able to access the API key, even though it is no longer embedded in the app configuration, and provide it to the shapes request.
+Run the app again without making any changes to the app and press the `Get Shape` button. You should now see a valid shape. This means that the app is able to access the API key, even though it is no longer embedded in the app configuration, and provide it to the shapes request.
