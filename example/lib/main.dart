@@ -25,11 +25,11 @@ import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
 // *** UNCOMMENT THE LINE BELOW FOR APPROOV ***
-import 'package:approov_service_flutter_httpclient/approov_service_flutter_httpclient.dart';
+//import 'package:approov_service_flutter_httpclient/approov_service_flutter_httpclient.dart';
 
 // Shapes API v1 is protected by an API key only - this is used initially and for SECRETS PROTECTION
 // v3 is protected by an API key and an Approov token - use this for API PROTECTION
-const String API_VERSION = 'v3';
+const String API_VERSION = 'v1';
 
 // Endpoint URLs to be used
 const String HELLO_URL = "https://shapes.approov.io/$API_VERSION/hello";
@@ -99,11 +99,9 @@ class _ShapesState extends State<Shapes> {
     });
     try {
       // *** COMMENT THE LINE BELOW FOR APPROOV ***
-      //http.Client client = http.Client();
+      http.Client client = http.Client();
       // *** UNCOMMENT THE LINE BELOW FOR APPROOV ***
-      http.Client client = ApproovClient(
-          '#cb-richardt#K/XPlLtfcWnWkzv99Wj5VmAxo4CrU267J1KlQyoz8Qo=');
-      ApproovService.setDevKey("blah-android");
+      //http.Client client = ApproovClient('<enter-your-config-string-here>');
 
       // *** UNCOMMENT THE LINE BELOW FOR APPROOV USING SECRETS PROTECTION ***
       //ApproovService.addSubstitutionHeader("api-key", null);
