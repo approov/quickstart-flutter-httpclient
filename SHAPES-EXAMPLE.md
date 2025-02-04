@@ -5,8 +5,8 @@ This quickstart is written specifically for native Android and iOS apps that are
 ## WHAT YOU WILL NEED
 * Access to a trial or paid Approov account
 * The `approov` command line tool [installed](https://approov.io/docs/latest/approov-installation/) with access to your account
-* [Android Studio](https://developer.android.com/studio) installed (version Hedgehog 2023.1.1 is used in this guide) if you will build the Android app
-* [Xcode](https://developer.apple.com/xcode/) installed (version 15.1 is used in this guide) to build iOS version of application
+* [Android Studio](https://developer.android.com/studio) installed (version Ladybug 2024.2.2 is used in this guide) if you will build the Android app
+* [Xcode](https://developer.apple.com/xcode/) installed (version 16.2 is used in this guide) to build iOS version of application
 * [Cocoapods](https://cocoapods.org) installed to support iOS building (1.12.1 used in this guide)
 * [Flutter](https://flutter.dev) stable version 3.16.5 is used in this guide. Note that integration is not possible with stable versions earlier than Flutter 3.
 * The contents of this repo
@@ -105,7 +105,7 @@ and change them as shown:
   approov_service_flutter_httpclient:
     git:
       url: https://github.com/approov/approov-service-flutter-httpclient.git
-      ref: 3.2.0
+      ref: 3.3.0
 ```
 
 In the source file `quickstart-flutter-httpclient/example/lib/main.dart` find the two locations marked with a comment and change them:
