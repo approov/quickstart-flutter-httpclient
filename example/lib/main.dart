@@ -25,7 +25,7 @@ import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
 // *** UNCOMMENT THE LINE BELOW FOR APPROOV ***
-import 'package:approov_service_flutter_httpclient/approov_service_flutter_httpclient.dart';
+//import 'package:approov_service_flutter_httpclient/approov_service_flutter_httpclient.dart';
 
 // Shapes API v1 is protected by an API key only - this is used initially and for SECRETS PROTECTION
 // v3 is protected by an API key and an Approov token - use this for API PROTECTION
