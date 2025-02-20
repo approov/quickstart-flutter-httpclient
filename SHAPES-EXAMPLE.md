@@ -18,7 +18,7 @@ The Shapes App is a simple Flutter application which demonstrates using the [Cli
 
 Before building the Flutter Shapes app, make sure that your system is set up for Flutter development by following the instructions at [Flutter Get Started](https://flutter.dev/docs/get-started/install).
 
-The application consists mostly of boilerplate code, apart from the definitions of the shapes server’s URLs and the onPressed callbacks (`hello()` and `shape()`) for the buttons along the bottom of the screen.
+The application consists mostly of boilerplate code, apart from the definitions of the shapes server’s URLs and the `onPressed` callbacks (`hello()` and `shape()`) for the buttons along the bottom of the screen.
 
 To run the app on an attached device, open a shell terminal at the `quickstart-flutter-httpclient/example` directory and type:
 
