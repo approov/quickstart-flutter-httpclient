@@ -102,10 +102,7 @@ and change them as shown:
 1. Add the dependency for the `approov_service_flutter_httpclient` package
 ```yaml
   # *** UNCOMMENT THE SECTION BELOW FOR APPROOV ***
-  approov_service_flutter_httpclient:
-    git:
-      url: https://github.com/approov/approov-service-flutter-httpclient.git
-      ref: 3.3.1
+  approov_service_flutter_httpclient: ^0.0.5
 ```
 
 In the source file `quickstart-flutter-httpclient/example/lib/main.dart` find the two locations marked with a comment and change them:
