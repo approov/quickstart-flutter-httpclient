@@ -17,6 +17,7 @@
 
 import 'dart:convert';
 import 'dart:isolate';
+import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -67,6 +68,12 @@ class _ShapesState extends State<Shapes> {
   // Status text to display below the image
   String _statusText = '';
 
+  // *** COMMENT THE LINE BELOW FOR APPROOV ***
+  final http.Client _client = http.Client();
+
+  // *** UNCOMMENT THE LINE BELOW FOR APPROOV ***
+  //final http.Client _client = ApproovClient();
+
   // Function called when 'Hello' button is pressed
   void hello() async {
     Log.i("$TAG: Hello button pressed. Checking connectivity...");
@@ -75,8 +82,7 @@ class _ShapesState extends State<Shapes> {
       _statusImageName = "images/approov.png";
     });
     try {
-      http.Client client = http.Client();
-      http.Response response = await client.get(Uri.parse(HELLO_URL));
+      http.Response response = await _client.get(Uri.parse(HELLO_URL));
       if (response.statusCode == 200) {
         Log.i("$TAG: Received connectivity response: ${utf8.decode(response.bodyBytes)}");
         _statusText = '${response.statusCode}: ${response.reasonPhrase}';
@@ -102,13 +108,7 @@ class _ShapesState extends State<Shapes> {
       _statusImageName = "images/approov.png";
     });
     try {
-      // *** COMMENT THE LINE BELOW FOR APPROOV ***
-      http.Client client = http.Client();
-
-      // *** UNCOMMENT THE LINE BELOW FOR APPROOV ***
-      //http.Client client = ApproovClient();
-
-      http.Response response = await client.get(Uri.parse(SHAPE_URL), headers: {"api-key": API_KEY});
+      http.Response response = await _client.get(Uri.parse(SHAPE_URL), headers: {"api-key": API_KEY});
       if (response.statusCode == 200) {
         Log.i("$TAG: Received a shape response from the Approov shapes server: ${utf8.decode(response.bodyBytes)}");
         Map<String, dynamic> json = jsonDecode(response.body);
@@ -131,7 +131,8 @@ class _ShapesState extends State<Shapes> {
   // Function called when 'Shape (Isolate)' button is pressed
   void shapeIsolate() async {
     Log.i(
-        "$TAG: Shape (Isolate) button pressed. Attempting to get a shape response from the Approov shapes server via an Isolate...");
+      "$TAG: Shape (Isolate) button pressed. Attempting to get a shape response from the Approov shapes server via an Isolate...",
+    );
     setState(() {
       _statusText = "Getting a shape...";
       _statusImageName = "images/approov.png";
@@ -140,12 +141,13 @@ class _ShapesState extends State<Shapes> {
     RootIsolateToken rootIsolateToken = RootIsolateToken.instance!;
     await Isolate.spawn(_isolateFetch, [resultPort.sendPort, rootIsolateToken]);
     final shape = await resultPort.first;
-    _statusText = "Received from Isolate";
+    _statusText = "Received shape from isolate";
     _statusImageName = 'images/$shape.png';
     setState(() {});
   }
 
-  // Function run within an isolate to fetch a Shape
+  // Function run within an isolate to fetch a Shape using the lower
+  // level HttpClient API.
   static Future<String> _isolateFetch(List<dynamic> args) async {
     SendPort responsePort = args[0];
     RootIsolateToken rootIsolateToken = args[1];
@@ -153,19 +155,22 @@ class _ShapesState extends State<Shapes> {
     String shape = "confused";
     try {
       // *** COMMENT THE LINE BELOW FOR APPROOV ***
-      http.Client client = http.Client();
+      HttpClient client = HttpClient();
 
       // *** UNCOMMENT THE TWO LINES BELOW FOR APPROOV ***
       //ApproovService.initialize('<enter-your-config-string-here>');
-      //http.Client client = ApproovClient();
+      //HttpClient client = ApproovHttpClient();
 
       // *** UNCOMMENT THE LINE BELOW FOR APPROOV USING SECRETS PROTECTION ***
       //ApproovService.addSubstitutionHeader("api-key", null);
 
-      http.Response response = await client.get(Uri.parse(SHAPE_URL), headers: {"api-key": API_KEY});
+      HttpClientRequest request = await client.getUrl(Uri.parse(SHAPE_URL));
+      request.headers.set("api-key", API_KEY);
+      HttpClientResponse response = await request.close();
       if (response.statusCode == 200) {
-        Log.i("$TAG: Received a shape response from the Approov shapes server: ${utf8.decode(response.bodyBytes)}");
-        Map<String, dynamic> json = jsonDecode(response.body);
+        final responseString = await response.transform(utf8.decoder).join();
+        Log.i("$TAG: Received a shape response from the Approov shapes server: $responseString");
+        Map<String, dynamic> json = jsonDecode(responseString);
         shape = (json["shape"] as String).toLowerCase();
       } else {
         Log.i("$TAG: Error on shape request: ${response.statusCode}");
@@ -181,12 +186,7 @@ class _ShapesState extends State<Shapes> {
     return Column(
       children: [
         // Status image
-        Image.asset(
-          statusImageName,
-          width: 600,
-          height: 240,
-          fit: BoxFit.contain,
-        ),
+        Image.asset(statusImageName, width: 600, height: 240, fit: BoxFit.contain),
         // Status text
         Text(statusText),
       ],
@@ -199,25 +199,11 @@ class _ShapesState extends State<Shapes> {
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         // Hello button
-        TextButton(
-            onPressed: hello,
-            child: Text(
-              'Hello',
-            )),
+        TextButton(onPressed: hello, child: Text('Hello')),
         // Shape button
-        TextButton(
-          onPressed: shape,
-          child: Text(
-            'Shape',
-          ),
-        ),
+        TextButton(onPressed: shape, child: Text('Shape')),
         // Shape Isolate button
-        TextButton(
-          onPressed: shapeIsolate,
-          child: Text(
-            'Shape (Isolate)',
-          ),
-        ),
+        TextButton(onPressed: shapeIsolate, child: Text('Shape (Isolate)')),
       ],
     );
   }
@@ -230,13 +216,7 @@ class _ShapesState extends State<Shapes> {
         body: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Text(
-              'Approov Shapes',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
+            Text('Approov Shapes', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w400)),
             statusImgTxt(_statusImageName, _statusText),
             buttons(),
           ],

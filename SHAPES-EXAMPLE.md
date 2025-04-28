@@ -120,22 +120,24 @@ ApproovService.initialize('<enter-your-config-string-here>');
 The `<enter-your-config-string-here>` is a custom string that configures your Approov account access. This will have been provided in your Approov onboarding email.
 
 3. Create an Approov Client:
+
 ```Dart
 // *** COMMENT THE LINE BELOW FOR APPROOV ***
-// http.Client client = http.Client();
+// final http.Client _client = http.Client();
 
 // *** UNCOMMENT THE LINE BELOW FOR APPROOV ***
-client = ApproovClient();
+final http.Client _client = ApproovClient();
 ```
 
-4. Udpdate the Isolate Version:
+4. Update the Isolate Version (which uses `ApproovHttpClient`):
+
 ```Dart
 // *** COMMENT THE LINE BELOW FOR APPROOV ***
-//http.Client client = http.Client();
+//HttpClient client = HttpClient();
 
 // *** UNCOMMENT THE TWO LINES BELOW FOR APPROOV ***
 ApproovService.initialize('<enter-your-config-string-here>');
-http.Client client = ApproovClient();
+HttpClient client = ApproovHttpClient();
 ```
 
 ### Select the Correct Shapes Endpoint
