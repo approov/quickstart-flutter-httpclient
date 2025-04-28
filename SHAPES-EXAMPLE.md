@@ -106,14 +106,16 @@ and change them as shown:
 In the source file `quickstart-flutter-httpclient/example/lib/main.dart` find the two locations marked with a comment and change them:
 
 1. Import the Approov service:
+
 ```Dart
 // *** UNCOMMENT THE LINE BELOW FOR APPROOV ***
 import 'package:approov_service_flutter_httpclient/approov_service_flutter_httpclient.dart';
 ```
 
 2. Initialize the Approov service:
+
 ```Dart
-// *** UNCOMMENT THE TWO LINES BELOW FOR APPROOV ***
+// *** UNCOMMENT THE LINE BELOW FOR APPROOV ***
 ApproovService.initialize('<enter-your-config-string-here>');
 ```
 

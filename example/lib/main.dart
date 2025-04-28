@@ -40,7 +40,7 @@ const String SHAPE_URL = "https://shapes.approov.io/$API_VERSION/shapes";
 const API_KEY = "yXClypapWNHIifHUWmBIyPFAm";
 
 void main() {
-  // *** UNCOMMENT THE TWO LINES BELOW FOR APPROOV ***
+  // *** UNCOMMENT THE LINE BELOW FOR APPROOV ***
   //ApproovService.initialize('<enter-your-config-string-here>');
 
   // *** UNCOMMENT THE LINE BELOW FOR APPROOV USING SECRETS PROTECTION ***
