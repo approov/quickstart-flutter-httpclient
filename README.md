@@ -21,7 +21,7 @@ This package is actually an open source wrapper layer that allows you to easily 
 The `approov_service_flutter_httpclient` package provides a number of accessible classes:
 
 1. `ApproovService` provides a higher level interface to the underlying Approov SDK
-2. `ApproovException`, and derived `ApproovNetworkException` and `ApproovRejectionException`, provide special exception classes for Approov related errors 
+2. `ApproovException`, and derived `ApproovNetworkException` and `ApproovRejectionException`, provide special exception classes for Approov related errors
 3. `ApproovHttpClient` which is a drop-in replacement for the Dart IO library's `HttpClient` and calls the `ApproovService`
 4. `ApproovClient` which is a drop-in replacement for Client from the Flutter http package (https://pub.dev/packages/http) and internally uses an `ApproovHttpClient` object
 
@@ -67,7 +67,7 @@ You can then create an `ApproovClient` when needed as follows:
 http.Client client = ApproovClient();
 ```
 
-After creatng the `ApproovClient` you can perform requests and await responses as normal, for example:
+After creating the `ApproovClient` you can perform requests and await responses as normal, for example:
 
 ```Dart
 http.Response response = await client.get(Uri.parse('https://your.domain/api'));
@@ -118,9 +118,9 @@ Note that if you are using [Sentry](https://docs.sentry.io/platforms/flutter/) t
 
 ## ISOLATES
 Note that it is possible to also use Approov from background isolates as well as the root isolate. This relies on support for [platform plugins in isolates
-](https://docs.flutter.dev/perf/isolates#using-platform-plugins-in-isolates) that was introduced in Flutter 3.7. Note that you must follow the instructions here regarding calling `BackgroundIsolateBinaryMessenger.ensureInitialized` or else Approov will not work in the isolate. 
+](https://docs.flutter.dev/perf/isolates#using-platform-plugins-in-isolates) that was introduced in Flutter 3.7. Note that you must follow the instructions given there regarding a call to `BackgroundIsolateBinaryMessenger.ensureInitialized` or else Approov will not work in the isolate.
 
-Since each isolate has a completely independent state you must call `ApproovService.initialize` in each isolate. You should do this as soon as possible after its creation. Make sure you provide exactly the same `config` string provided in the root and all other isolates, since the underlying Approov SDK is shared between them all and can only have a single active configuration at one time. Note that the Approov implementation in the root isolate may be marginally faster than those in other isolates since it is able to use the method callbacks from native code which are not available in background isolates. 
+Since each isolate has a completely independent state you must call `ApproovService.initialize` in each isolate. You should do this as soon as possible after its creation. Make sure you provide exactly the same `config` string provided in the root and all other isolates, since the underlying Approov SDK is shared between them all and can only have a single active configuration at one time. Note that the Approov implementation in the root isolate may be marginally faster than those in other isolates since it is able to use the method callbacks from native code which are not available to background isolates.
 
 ## CHECKING IT WORKS
 Initially you won't have set which API domains to protect, so the interceptor will not add anything. It will have called Approov though and made contact with the Approov cloud service. You will see logging from Approov saying `UNKNOWN_URL`.
