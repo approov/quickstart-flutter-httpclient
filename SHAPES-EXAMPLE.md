@@ -1,14 +1,14 @@
 # Shapes Example
 
-This quickstart is written specifically for native Android and iOS apps that are written in [`Flutter`](https://flutter.dev/) and the [`Dart HTTPClient class from the dart:io library`](https://api.dart.dev/stable/2.9.3/dart-io/HttpClient-class.html) or the [`Flutter HTTP package`](https://pub.dev/packages/http) for making the API calls that you wish to protect with Approov. This quickstart provides a step-by-step example of integrating Approov into an app using a simple `Shapes` example that shows a geometric shape based on a request to an API backend that can be protected with Approov.
+This quickstart is written specifically for native Android and iOS apps that are written in [`Flutter`](https://flutter.dev/) and the [`Dart HTTPClient class from the dart:io library`](https://pub.dev/documentation/http/latest/http/Client-class.html) or the [`Flutter HTTP package`](https://pub.dev/packages/http) for making the API calls that you wish to protect with Approov. This quickstart provides a step-by-step example of integrating Approov into an app using a simple `Shapes` example that shows a geometric shape based on a request to an API backend that can be protected with Approov.
 
 ## WHAT YOU WILL NEED
 * Access to a trial or paid Approov account
 * The `approov` command line tool [installed](https://approov.io/docs/latest/approov-installation/) with access to your account
 * [Android Studio](https://developer.android.com/studio) installed (version Ladybug 2024.2.2 is used in this guide) if you will build the Android app
-* [Xcode](https://developer.apple.com/xcode/) installed (version 16.2 is used in this guide) to build iOS version of application
-* [Cocoapods](https://cocoapods.org) installed to support iOS building (1.12.1 used in this guide)
-* [Flutter](https://flutter.dev) stable version 3.16.5 is used in this guide. Note that integration is not possible with stable versions earlier than Flutter 3.
+* [Xcode](https://developer.apple.com/xcode/) installed (version 16.3 is used in this guide) to build the iOS app
+* [Cocoapods](https://cocoapods.org) installed to support iOS building (1.16.2 used in this guide)
+* [Flutter](https://flutter.dev) stable version 3.29.2 is used in this guide. Note that integration is not possible with stable versions earlier than Flutter 3.7.
 * The contents of this repo
 
 
@@ -32,7 +32,7 @@ You should now be able to use the app to say hello and get shapes.
     <img src="readme-images/flutter-shapes-app-start.png" width="256" title="Shapes App">
 </p>
 
-The _Hello_ and _Shape_ buttons initiate API requests to the shapes server, using the Flutter http package's Client. For example, the _Hello_ button initiates a `GET` request to the `shapes.approov.io/v1/hello` endpoint.
+The _Hello_, _Shape_ and _Shape (Isolate)_ buttons initiate API requests to the shapes server, using the Flutter http package's Client. For example, the _Hello_ button initiates a `GET` request to the `shapes.approov.io/v1/hello` endpoint.
 
 On a successful _hello_ request to `/v1/hello`, the client app will say hello with a smile, while a failure or unsuccessful response will return a frown with some explanation of the error. The purpose of this simple endpoint is really just to test connectivity and to verify that you have built, installed and run the demo app correctly.
 
@@ -40,17 +40,15 @@ On a successful _hello_ request to `/v1/hello`, the client app will say hello wi
     <img src="readme-images/flutter-shapes-app-okay.png" width="256" title="Shapes App Good">
 </a>
 
-<a>
-    <img src="readme-images/flutter-shapes-app-fail.png" width="256" title="Shapes App Fail">
-</a>
-
 Tap _Shape_ and you should see this (or a different shape):
 
 <a>
-    <img src="readme-images/flutter-shape-triangle.png" width="256" title="Triangle">
+    <img src="readme-images/flutter-shapes-app-square.png" width="256" title="Triangle">
 </a>
 
 This contacts `https://shapes.approov.io/v1/shapes` to get the name of a random shape. This endpoint is protected with an API key that is built into the code, and therefore can be easily extracted from the app.
+
+Tapping the _Shape (Isolate)_ button will also show a shape, but the API call in this case is made from a new Isolate that is spawned for this purpose. This is to illustrate how Approov can be integrated into apps that make use of isolates for networking calls.
 
 The subsequent steps of this guide show you how to provide better protection, either using an Approov Token or by migrating the API key to become an Approov managed secret.
 
@@ -102,26 +100,47 @@ and change them as shown:
 1. Add the dependency for the `approov_service_flutter_httpclient` package
 ```yaml
   # *** UNCOMMENT THE SECTION BELOW FOR APPROOV ***
-  approov_service_flutter_httpclient: ^0.0.5
+  approov_service_flutter_httpclient: ^3.4.1
 ```
 
 In the source file `quickstart-flutter-httpclient/example/lib/main.dart` find the two locations marked with a comment and change them:
 
 1. Import the Approov service:
+
 ```Dart
 // *** UNCOMMENT THE LINE BELOW FOR APPROOV ***
 import 'package:approov_service_flutter_httpclient/approov_service_flutter_httpclient.dart';
 ```
 
-2. Create a Client:
+2. Initialize the Approov service:
+
 ```Dart
-// *** COMMENT THE LINE BELOW FOR APPROOV ***
-// http.Client client = http.Client();
 // *** UNCOMMENT THE LINE BELOW FOR APPROOV ***
-client = ApproovClient('<enter-your-config-string-here>');
+ApproovService.initialize('<enter-your-config-string-here>');
 ```
 
 The `<enter-your-config-string-here>` is a custom string that configures your Approov account access. This will have been provided in your Approov onboarding email.
+
+3. Create an Approov Client:
+
+```Dart
+// *** COMMENT THE LINE BELOW FOR APPROOV ***
+// final http.Client _client = http.Client();
+
+// *** UNCOMMENT THE LINE BELOW FOR APPROOV ***
+final http.Client _client = ApproovClient();
+```
+
+4. Update the Isolate Version (which uses `ApproovHttpClient`):
+
+```Dart
+// *** COMMENT THE LINE BELOW FOR APPROOV ***
+//HttpClient client = HttpClient();
+
+// *** UNCOMMENT THE TWO LINES BELOW FOR APPROOV ***
+ApproovService.initialize('<enter-your-config-string-here>');
+HttpClient client = ApproovHttpClient();
+```
 
 ### Select the Correct Shapes Endpoint
 
@@ -157,7 +176,7 @@ For iOS: Note that it may be necessary to run the command `pod update` in the `q
 Install and run the app on a device and examine the logging. You should see in the logs that Approov is successfully fetching tokens, but the Shapes API is not returning valid shapes:
 
 <p>
-    <img src="readme-images/flutter-shape-invalid.jpg" width="256" title="Invalid">
+    <img src="readme-images/flutter-shapes-app-invalid.png" width="256" title="Invalid">
 </p>
 
 ## ADD YOUR SIGNING CERTIFICATE TO APPROOV
@@ -197,7 +216,7 @@ If it is not possible to download the correct certificate from the portal then i
 Restart the application on your device to ensure a new Approov token is fetched, tap _Shape_ and you should see this (or a different shape)::
 
 <a>
-    <img src="readme-images/flutter-shape-circle.png" width="256" title="Circle">
+    <img src="readme-images/flutter-shapes-app-square.png" width="256" title="Circle">
 </a>
 
 Congratulations, your API is now Approoved!
@@ -236,11 +255,13 @@ approov secstrings -addKey shapes_api_key_placeholder -predefinedValue yXClypapW
 
 > Note that this command requires an [admin role](https://approov.io/docs/latest/approov-usage-documentation/#account-access-roles).
 
-Next we need to inform Approov that it needs to substitute the placeholder value for the real API key on the `api-key` header. Only a single line of code needs to be changed as follows:
+Next we need to inform Approov that it needs to substitute the placeholder value for the real API key on the `api-key` header. This line of code needs to be changed as follows:
 
 ```Dart
 // *** UNCOMMENT THE LINE BELOW FOR APPROOV USING SECRETS PROTECTION ***
 ApproovService.addSubstitutionHeader("api-key", null);
 ```
+
+Note that is also an indentical line in Isolate version of the shape fetching that also needs to be uncommented.
 
 Run the app again without making any changes to the app and press the `Get Shape` button. You should now see a valid shape. This means that the app is able to access the API key, even though it is no longer embedded in the app configuration, and provide it to the shapes request.
