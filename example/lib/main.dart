@@ -19,13 +19,14 @@ import 'dart:convert';
 import 'dart:isolate';
 import 'dart:io';
 
-import 'package:flutter/services.dart';
+import 'package:approov_service_flutter_httpclient/approov_service_flutter_httpclient.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
-// *** UNCOMMENT THE LINE BELOW FOR APPROOV ***
-//import 'package:approov_service_flutter_httpclient/approov_service_flutter_httpclient.dart';
+const String _approovConfigString = '<enter-your-config-string-here>';
+const bool _approovEnabled = _approovConfigString != '<enter-your-config-string-here>';
 
 // Shapes API v1 is protected by an API key only - this is used initially and for SECRETS PROTECTION
 // v3 is protected by an API key and an Approov token - use this for API PROTECTION
@@ -39,18 +40,28 @@ const String SHAPE_URL = "https://shapes.approov.io/$API_VERSION/shapes";
 // using SECRETS PROTECTION
 const API_KEY = "yXClypapWNHIifHUWmBIyPFAm";
 
-void main() {
-  // *** UNCOMMENT THE LINE BELOW FOR APPROOV ***
-  //ApproovService.initialize('<enter-your-config-string-here>');
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-  // *** UNCOMMENT THE LINE BELOW FOR APPROOV USING SECRETS PROTECTION ***
-  //ApproovService.addSubstitutionHeader("api-key", null);
+  if (_approovEnabled) {
+    await ApproovService.initialize(_approovConfigString);
 
-  // execute the main function of the app
-  runApp(Shapes());
+    // Uncomment the next line if you have the API key stored in Approov secure strings.
+    //ApproovService.addSubstitutionHeader("api-key", null);
+
+    final signatureFactory = SignatureParametersFactory.generateDefaultFactory()
+      ..addOptionalHeaders(const ['api-key']);
+    ApproovService.enableMessageSigning(defaultFactory: signatureFactory);
+  }
+
+  runApp(Shapes(approovEnabled: _approovEnabled));
 }
 
 class Shapes extends StatefulWidget {
+  const Shapes({super.key, required this.approovEnabled});
+
+  final bool approovEnabled;
+
   @override
   _ShapesState createState() => _ShapesState();
 }
@@ -68,11 +79,17 @@ class _ShapesState extends State<Shapes> {
   // Status text to display below the image
   String _statusText = '';
 
-  // *** COMMENT THE LINE BELOW FOR APPROOV ***
-  final http.Client _client = http.Client();
+  late final http.Client _client;
 
-  // *** UNCOMMENT THE LINE BELOW FOR APPROOV ***
-  //final http.Client _client = ApproovClient();
+  @override
+  void initState() {
+    super.initState();
+    if (widget.approovEnabled) {
+      _client = ApproovClient();
+    } else {
+      _client = http.Client();
+    }
+  }
 
   // Function called when 'Hello' button is pressed
   void hello() async {
@@ -139,7 +156,10 @@ class _ShapesState extends State<Shapes> {
     });
     final resultPort = ReceivePort();
     RootIsolateToken rootIsolateToken = RootIsolateToken.instance!;
-    await Isolate.spawn(_isolateFetch, [resultPort.sendPort, rootIsolateToken]);
+    await Isolate.spawn(
+      _isolateFetch,
+      [resultPort.sendPort, rootIsolateToken, widget.approovEnabled],
+    );
     final shape = await resultPort.first;
     _statusText = "Received shape from isolate";
     _statusImageName = 'images/$shape.png';
@@ -151,18 +171,20 @@ class _ShapesState extends State<Shapes> {
   static Future<String> _isolateFetch(List<dynamic> args) async {
     SendPort responsePort = args[0];
     RootIsolateToken rootIsolateToken = args[1];
+    final bool approovEnabled = args[2] as bool;
     BackgroundIsolateBinaryMessenger.ensureInitialized(rootIsolateToken);
     String shape = "confused";
     try {
-      // *** COMMENT THE LINE BELOW FOR APPROOV ***
-      HttpClient client = HttpClient();
-
-      // *** UNCOMMENT THE TWO LINES BELOW FOR APPROOV ***
-      //ApproovService.initialize('<enter-your-config-string-here>');
-      //HttpClient client = ApproovHttpClient();
-
-      // *** UNCOMMENT THE LINE BELOW FOR APPROOV USING SECRETS PROTECTION ***
-      //ApproovService.addSubstitutionHeader("api-key", null);
+      HttpClient client;
+      if (approovEnabled) {
+        await ApproovService.initialize(_approovConfigString);
+        final signatureFactory = SignatureParametersFactory.generateDefaultFactory()
+          ..addOptionalHeaders(const ['api-key']);
+        ApproovService.enableMessageSigning(defaultFactory: signatureFactory);
+        client = ApproovHttpClient();
+      } else {
+        client = HttpClient();
+      }
 
       HttpClientRequest request = await client.getUrl(Uri.parse(SHAPE_URL));
       request.headers.set("api-key", API_KEY);
