@@ -25,7 +25,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
-const String _approovConfigString = '#dev-adriant#att-dev-adriant.critical.blue#https://dev.approoval.com/token#RFqDgJxiNi4+XhiuG1uzi1GztySzLDENilrsWyr2KSE=';
+const String _approovConfigString = '<enter-your-config-string-here>';
 const bool _approovEnabled = _approovConfigString != '<enter-your-config-string-here>';
 
 // Shapes API v1 is protected by an API key only - this is used initially and for SECRETS PROTECTION
