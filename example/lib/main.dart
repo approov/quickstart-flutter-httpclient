@@ -25,12 +25,12 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
-const String _approovConfigString = '<enter-your-config-string-here>';
+const String _approovConfigString = '#dev-adriant#att-dev-adriant.critical.blue#https://dev.approoval.com/token#RFqDgJxiNi4+XhiuG1uzi1GztySzLDENilrsWyr2KSE=';
 const bool _approovEnabled = _approovConfigString != '<enter-your-config-string-here>';
 
 // Shapes API v1 is protected by an API key only - this is used initially and for SECRETS PROTECTION
 // v3 is protected by an API key and an Approov token - use this for API PROTECTION
-const String API_VERSION = 'v1';
+const String API_VERSION = 'v5';
 
 // Endpoint URLs to be used
 const String HELLO_URL = "https://shapes.approov.io/$API_VERSION/hello";
@@ -38,7 +38,7 @@ const String SHAPE_URL = "https://shapes.approov.io/$API_VERSION/shapes";
 
 // API key 'yXClypapWNHIifHUWmBIyPFAm' used to protect the shapes endpoint. Change this to 'shapes_api_key_placeholder' when
 // using SECRETS PROTECTION
-const API_KEY = "yXClypapWNHIifHUWmBIyPFAm";
+const API_KEY = "shapes_api_key_placeholder";
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,11 +47,12 @@ Future<void> main() async {
     await ApproovService.initialize(_approovConfigString);
 
     // Uncomment the next line if you have the API key stored in Approov secure strings.
-    //ApproovService.addSubstitutionHeader("api-key", null);
+    ApproovService.addSubstitutionHeader("api-key", null);
 
     final signatureFactory = SignatureParametersFactory.generateDefaultFactory()
       ..addOptionalHeaders(const ['api-key']);
     ApproovService.enableMessageSigning(defaultFactory: signatureFactory);
+    ApproovService.setMessageSigningDebugLogging(true);
   }
 
   runApp(Shapes(approovEnabled: _approovEnabled));
@@ -181,6 +182,7 @@ class _ShapesState extends State<Shapes> {
         final signatureFactory = SignatureParametersFactory.generateDefaultFactory()
           ..addOptionalHeaders(const ['api-key']);
         ApproovService.enableMessageSigning(defaultFactory: signatureFactory);
+        ApproovService.setMessageSigningDebugLogging(true);
         client = ApproovHttpClient();
       } else {
         client = HttpClient();
