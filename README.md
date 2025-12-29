@@ -13,7 +13,7 @@ Note that the minimum OS requirement for iOS is 12 and for Android the minimum S
 The Approov integration is available via [`pub-dev`](https://pub.dev/packages/approov_service_flutter_httpclient) package. This allows inclusion into the project by simply specifying a dependency in the `pubspec.yaml` files for the app. In the `dependencies:` section of `pubspec.yaml` file add the following package reference:
 
 ```yaml
-approov_service_flutter_httpclient: ^3.4.1
+approov_service_flutter_httpclient: ^3.5.5
 ```
 
 This package is actually an open source wrapper layer that allows you to easily use Approov with `Flutter`. This has a further dependency to the closed source [Android Approov SDK](https://github.com/approov/approov-android-sdk) and [iOS Approov SDK](https://github.com/approov/approov-ios-sdk) packages. Those are automatically added as dependencies for the platform specific targets.
