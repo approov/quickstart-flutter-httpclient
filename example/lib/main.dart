@@ -29,15 +29,15 @@ import 'package:logger/logger.dart';
 
 // Shapes API v1 is protected by an API key only - this is used initially and for SECRETS PROTECTION
 // v3 is protected by an API key and an Approov token - use this for API PROTECTION
-const String API_VERSION = 'v1';
+const String apiVersion = 'v1';
 
 // Endpoint URLs to be used
-const String HELLO_URL = "https://shapes.approov.io/$API_VERSION/hello";
-const String SHAPE_URL = "https://shapes.approov.io/$API_VERSION/shapes";
+const String helloUrl = "https://shapes.approov.io/$apiVersion/hello";
+const String shapeUrl = "https://shapes.approov.io/$apiVersion/shapes";
 
 // API key 'yXClypapWNHIifHUWmBIyPFAm' used to protect the shapes endpoint. Change this to 'shapes_api_key_placeholder' when
 // using SECRETS PROTECTION
-const API_KEY = "yXClypapWNHIifHUWmBIyPFAm";
+const String apiKey = "yXClypapWNHIifHUWmBIyPFAm";
 
 void main() {
   // *** UNCOMMENT THE LINE BELOW FOR APPROOV ***
@@ -51,16 +51,18 @@ void main() {
 }
 
 class Shapes extends StatefulWidget {
+  const Shapes({super.key});
+  
   @override
-  _ShapesState createState() => _ShapesState();
+  State<Shapes> createState() => ShapesState();
 }
 
-class _ShapesState extends State<Shapes> {
+class ShapesState extends State<Shapes> {
   // logger
-  static Logger Log = Logger();
+  static Logger log = Logger();
 
   // logging tag
-  static const String TAG = "APPROOV SHAPES FLUTTER";
+  static const String tag = "APPROOV SHAPES FLUTTER";
 
   // Name of the image that shows the current app status
   String _statusImageName = 'images/approov.png';
@@ -76,46 +78,46 @@ class _ShapesState extends State<Shapes> {
 
   // Function called when 'Hello' button is pressed
   void hello() async {
-    Log.i("$TAG: Hello button pressed. Checking connectivity...");
+    log.i("$tag: Hello button pressed. Checking connectivity...");
     setState(() {
       _statusText = "Checking connectivity...";
       _statusImageName = "images/approov.png";
     });
     try {
-      http.Response response = await _client.get(Uri.parse(HELLO_URL));
+      http.Response response = await _client.get(Uri.parse(helloUrl));
       if (response.statusCode == 200) {
-        Log.i("$TAG: Received connectivity response: ${utf8.decode(response.bodyBytes)}");
+        log.i("$tag: Received connectivity response: ${utf8.decode(response.bodyBytes)}");
         _statusText = '${response.statusCode}: ${response.reasonPhrase}';
         _statusImageName = 'images/hello.png';
       } else {
-        Log.i("$TAG: Error on connectivity request: ${response.statusCode}");
+        log.i("$tag: Error on connectivity request: ${response.statusCode}");
         _statusText = "${response.statusCode}: ${response.reasonPhrase}";
         _statusImageName = 'images/confused.png';
       }
     } catch (e) {
       _statusText = e.toString();
       _statusImageName = 'images/confused.png';
-      Log.e("$TAG: ${e.toString()}");
+      log.e("$tag: ${e.toString()}");
     }
     setState(() {});
   }
 
   // Function called when 'Shape' button is pressed
   void shape() async {
-    Log.i("$TAG: Shape button pressed. Attempting to get a shape response from the Approov shapes server...");
+    log.i("$tag: Shape button pressed. Attempting to get a shape response from the Approov shapes server...");
     setState(() {
       _statusText = "Getting a shape...";
       _statusImageName = "images/approov.png";
     });
     try {
-      http.Response response = await _client.get(Uri.parse(SHAPE_URL), headers: {"api-key": API_KEY});
+      http.Response response = await _client.get(Uri.parse(shapeUrl), headers: {"api-key": apiKey});
       if (response.statusCode == 200) {
-        Log.i("$TAG: Received a shape response from the Approov shapes server: ${utf8.decode(response.bodyBytes)}");
+        log.i("$tag: Received a shape response from the Approov shapes server: ${utf8.decode(response.bodyBytes)}");
         Map<String, dynamic> json = jsonDecode(response.body);
         _statusText = '${response.statusCode}: ${response.reasonPhrase}';
         _statusImageName = 'images/${(json["shape"] as String).toLowerCase()}.png';
       } else {
-        Log.i("$TAG: Error on shape request: ${response.statusCode}");
+        log.i("$tag: Error on shape request: ${response.statusCode}");
         Map<String, dynamic> json = jsonDecode(response.body);
         _statusText = "${response.statusCode}: ${response.reasonPhrase}\n${json['status']}";
         _statusImageName = 'images/confused.png';
@@ -123,15 +125,15 @@ class _ShapesState extends State<Shapes> {
     } catch (e) {
       _statusText = e.toString();
       _statusImageName = 'images/confused.png';
-      Log.e("$TAG: ${e.toString()}");
+      log.e("$tag: ${e.toString()}");
     }
     setState(() {});
   }
 
   // Function called when 'Shape (Isolate)' button is pressed
   void shapeIsolate() async {
-    Log.i(
-      "$TAG: Shape (Isolate) button pressed. Attempting to get a shape response from the Approov shapes server via an Isolate...",
+    log.i(
+      "$tag: Shape (Isolate) button pressed. Attempting to get a shape response from the Approov shapes server via an Isolate...",
     );
     setState(() {
       _statusText = "Getting a shape...";
@@ -164,19 +166,19 @@ class _ShapesState extends State<Shapes> {
       // *** UNCOMMENT THE LINE BELOW FOR APPROOV USING SECRETS PROTECTION ***
       //ApproovService.addSubstitutionHeader("api-key", null);
 
-      HttpClientRequest request = await client.getUrl(Uri.parse(SHAPE_URL));
-      request.headers.set("api-key", API_KEY);
+      HttpClientRequest request = await client.getUrl(Uri.parse(shapeUrl));
+      request.headers.set("api-key", apiKey);
       HttpClientResponse response = await request.close();
       if (response.statusCode == 200) {
         final responseString = await response.transform(utf8.decoder).join();
-        Log.i("$TAG: Received a shape response from the Approov shapes server: $responseString");
+        log.i("$tag: Received a shape response from the Approov shapes server: $responseString");
         Map<String, dynamic> json = jsonDecode(responseString);
         shape = (json["shape"] as String).toLowerCase();
       } else {
-        Log.i("$TAG: Error on shape request: ${response.statusCode}");
+        log.i("$tag: Error on shape request: ${response.statusCode}");
       }
     } catch (e) {
-      Log.e("$TAG: ${e.toString()}");
+      log.e("$tag: ${e.toString()}");
     }
     Isolate.exit(responsePort, shape);
   }
