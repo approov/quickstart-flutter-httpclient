@@ -100,7 +100,7 @@ and change them as shown:
 1. Add the dependency for the `approov_service_flutter_httpclient` package
 ```yaml
   # *** UNCOMMENT THE SECTION BELOW FOR APPROOV ***
-  approov_service_flutter_httpclient: ^3.5.6
+  approov_service_flutter_httpclient: ^3.5.8
 ```
 
 In the source file `quickstart-flutter-httpclient/example/lib/main.dart` find the two locations marked with a comment and change them:
@@ -116,8 +116,10 @@ import 'package:approov_service_flutter_httpclient/approov_service_flutter_httpc
 
 ```Dart
 // *** UNCOMMENT THE LINE BELOW FOR APPROOV ***
-ApproovService.initialize('<enter-your-config-string-here>');
+await ApproovService.initialize('<enter-your-config-string-here>');
 ```
+
+The `main` function is already `async`. Keep the `await`: a successful initialization resets the service configuration, so the `addSubstitutionHeader` call that follows it is lost if it runs before initialization completes.
 
 The `<enter-your-config-string-here>` is a custom string that configures your Approov account access. This will have been provided in your Approov onboarding email.
 
@@ -138,7 +140,7 @@ final http.Client _client = ApproovClient();
 //HttpClient client = HttpClient();
 
 // *** UNCOMMENT THE TWO LINES BELOW FOR APPROOV ***
-ApproovService.initialize('<enter-your-config-string-here>');
+await ApproovService.initialize('<enter-your-config-string-here>');
 HttpClient client = ApproovHttpClient();
 ```
 

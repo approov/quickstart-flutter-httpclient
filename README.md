@@ -13,7 +13,7 @@ Note that the minimum OS requirement for iOS is 12 and for Android the minimum S
 The Approov integration is available via [`pub-dev`](https://pub.dev/packages/approov_service_flutter_httpclient) package. This allows inclusion into the project by simply specifying a dependency in the `pubspec.yaml` files for the app. In the `dependencies:` section of `pubspec.yaml` file add the following package reference:
 
 ```yaml
-approov_service_flutter_httpclient: ^3.5.6
+approov_service_flutter_httpclient: ^3.5.8
 ```
 
 This package is actually an open source wrapper layer that allows you to easily use Approov with `Flutter`. This has a further dependency to the closed source [Android Approov SDK](https://github.com/approov/approov-android-sdk) and [iOS Approov SDK](https://github.com/approov/approov-ios-sdk) packages. Those are automatically added as dependencies for the platform specific targets.
@@ -55,8 +55,10 @@ You must initialize the `ApproovService` as early as possible in the initializat
 ```Dart
 import 'package:approov_service_flutter_httpclient/approov_service_flutter_httpclient.dart';
 ...
-ApproovService.initialize('<enter-your-config-string-here>');
+await ApproovService.initialize('<enter-your-config-string-here>');
 ```
+
+The `initialize` method is asynchronous. Wait for it to complete (`await`) before you call any other `ApproovService` method, for example `addSubstitutionHeader`. A successful initialization resets the service configuration, so a configuration call made before it completes is lost. If initialization fails, `initialize` throws an `ApproovException`.
 
 The `<enter-your-config-string-here>` is a custom string that configures your Approov account access. This will have been provided in your Approov onboarding email.
 
@@ -120,7 +122,7 @@ Note that if you are using [Sentry](https://docs.sentry.io/platforms/flutter/) t
 Note that it is possible to also use Approov from background isolates as well as the root isolate. This relies on support for [platform plugins in isolates
 ](https://docs.flutter.dev/perf/isolates#using-platform-plugins-in-isolates) that was introduced in Flutter 3.7. Note that you must follow the instructions given there regarding a call to `BackgroundIsolateBinaryMessenger.ensureInitialized` or else Approov will not work in the isolate.
 
-Since each isolate has a completely independent state you must call `ApproovService.initialize` in each isolate. You should do this as soon as possible after its creation. Make sure you provide exactly the same `config` string provided in the root and all other isolates, since the underlying Approov SDK is shared between them all and can only have a single active configuration at one time. Note that the Approov implementation in the root isolate may be marginally faster than those in other isolates since it is able to use the method callbacks from native code which are not available to background isolates.
+Since each isolate has a completely independent state you must call `ApproovService.initialize` in each isolate and wait for it to complete (`await`). You should do this as soon as possible after its creation. Make sure you provide exactly the same `config` string provided in the root and all other isolates, since the underlying Approov SDK is shared between them all and can only have a single active configuration at one time. Note that the Approov implementation in the root isolate may be marginally faster than those in other isolates since it is able to use the method callbacks from native code which are not available to background isolates.
 
 ## CHECKING IT WORKS
 Initially you won't have set which API domains to protect, so the interceptor will not add anything. It will have called Approov though and made contact with the Approov cloud service. You will see logging from Approov saying `UNKNOWN_URL`.
