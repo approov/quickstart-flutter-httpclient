@@ -39,9 +39,13 @@ const String SHAPE_URL = "https://shapes.approov.io/$API_VERSION/shapes";
 // using SECRETS PROTECTION
 const API_KEY = "yXClypapWNHIifHUWmBIyPFAm";
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   // *** UNCOMMENT THE LINE BELOW FOR APPROOV ***
-  //ApproovService.initialize('<enter-your-config-string-here>');
+  // Wait for initialization to complete before any other ApproovService call. A successful
+  // initialization resets the service configuration, so a call made before it completes is lost.
+  //await ApproovService.initialize('<enter-your-config-string-here>');
 
   // *** UNCOMMENT THE LINE BELOW FOR APPROOV USING SECRETS PROTECTION ***
   //ApproovService.addSubstitutionHeader("api-key", null);
@@ -158,7 +162,7 @@ class _ShapesState extends State<Shapes> {
       HttpClient client = HttpClient();
 
       // *** UNCOMMENT THE TWO LINES BELOW FOR APPROOV ***
-      //ApproovService.initialize('<enter-your-config-string-here>');
+      //await ApproovService.initialize('<enter-your-config-string-here>');
       //HttpClient client = ApproovHttpClient();
 
       // *** UNCOMMENT THE LINE BELOW FOR APPROOV USING SECRETS PROTECTION ***
